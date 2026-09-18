@@ -61,6 +61,9 @@ textarea { resize: vertical; }
 #p1-input { min-height: 220px; font-size: 18px; line-height: 1.9; margin-top: 14px; }
 
 /* Part 2: Gmail compose */
+.p2-layout { display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; align-items: start; }
+@media (max-width: 1000px) { .p2-layout { grid-template-columns: 1fr; } }
+.p2-instructions { margin: 0; position: sticky; top: 16px; }
 .email-target { font-family: "Consolas", "Courier New", monospace; white-space: pre-wrap; background: #fff; border: 1px dashed var(--border); border-radius: 8px; padding: 14px 16px; user-select: none; -webkit-user-select: none; }
 .gmail { border: 1px solid #dadce0; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.18); background: #fff; font-family: "Google Sans", Roboto, Arial, sans-serif; overflow: hidden; }
 .gmail-head { background: #f2f6fc; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 15px; color: #041e49; }
@@ -72,7 +75,7 @@ textarea { resize: vertical; }
 .gmail-row .ccbcc { display: flex; gap: 8px; }
 .gmail-row .ccbcc button { background: none; border: 0; color: #444746; font-size: 15px; cursor: pointer; padding: 4px 2px; }
 .gmail-row .ccbcc button:hover { text-decoration: underline; }
-.gmail-body { min-height: 420px; padding: 14px 18px; font-size: 15px; outline: none; white-space: pre-wrap; line-height: 1.5; color: #1f1f1f; }
+.gmail-body { min-height: 320px; padding: 14px 18px; font-size: 15px; outline: none; white-space: pre-wrap; line-height: 1.5; color: #1f1f1f; }
 .gmail-foot { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-top: 1px solid #e0e0e0; }
 .gmail-send { display: flex; }
 .gmail-send button { background: var(--gmail-blue); color: #fff; border: 0; font-size: 15px; font-weight: 500; padding: 10px 24px; border-radius: 18px 0 0 18px; cursor: pointer; }
@@ -84,20 +87,24 @@ textarea { resize: vertical; }
 /* Part 3: B/L compare */
 .bl-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 @media (max-width: 1000px) { .bl-compare { grid-template-columns: 1fr; } }
-.bl { border: 2px solid #111; background: #fff; font-family: Arial, Helvetica, sans-serif; font-size: 12.5px; }
-.bl-head { text-align: center; border-bottom: 2px solid #111; padding: 8px; }
-.bl-head .co { font-weight: 700; font-size: 14px; }
-.bl-head .addr { font-size: 11px; color: #333; }
-.bl-head .title { font-weight: 700; font-size: 16px; margin-top: 4px; letter-spacing: 1px; }
-.bl-head .sub { font-size: 11.5px; color: #555; }
+.bl { border: 2px solid #111; background: #fff; font-family: Arial, Helvetica, sans-serif; }
 .bl-grid { display: grid; grid-template-columns: 1fr 1fr; }
-.bl-cell { border: 1px solid #111; padding: 4px 6px; min-height: 40px; }
+.bl-cell { position: relative; border: 1px solid #111; padding: 4px 6px 6px; }
 .bl-cell.full { grid-column: 1 / -1; }
-.bl-cell .lbl { font-size: 9.5px; font-weight: 700; color: #333; text-transform: uppercase; margin-bottom: 2px; }
-.bl-cell .val { white-space: pre-wrap; font-size: 12.5px; font-weight: 600; user-select: none; -webkit-user-select: none; }
-.bl-cell input, .bl-cell textarea { width: 100%; font: inherit; font-size: 12.5px; font-weight: 600; padding: 3px 5px; border: 1px solid #9aa3b2; border-radius: 4px; background: #fffef5; }
-.bl-cell textarea { resize: none; line-height: 1.35; }
-.bl-cell input:focus, .bl-cell textarea:focus { outline: 2px solid var(--navy); }
+.bl-cell .lbl { font-size: 9.5px; line-height: 12px; height: 12px; font-weight: 700; color: #333; text-transform: uppercase; margin-bottom: 2px; }
+/* .val และ textarea ใช้กล่อง/ฟอนต์/บรรทัดเดียวกันทุกประการ ให้สองฝั่งตรงกันเป๊ะ */
+.bl-cell .val, .bl-cell textarea {
+  display: block; box-sizing: border-box; width: 100%; margin: 0; padding: 2px 4px;
+  font-family: Arial, Helvetica, sans-serif; font-size: 12.5px; font-weight: 600; line-height: 18px;
+  height: calc(var(--rows, 1) * 18px + 4px); white-space: pre-wrap; overflow: hidden; border: 1px solid transparent; border-radius: 3px;
+}
+.bl-cell .val { user-select: none; -webkit-user-select: none; }
+.bl.editable .bl-cell { cursor: text; }
+.bl.editable .bl-cell:hover .val { background: #f4f6fa; }
+.bl-cell textarea { display: none; resize: none; background: #fffbe6; border-color: var(--navy); color: var(--text); }
+.bl-cell textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(28,58,110,.25); }
+.bl-cell.editing .val { display: none; }
+.bl-cell.editing textarea { display: block; }
 .bl-caption { font-weight: 700; margin-bottom: 8px; color: var(--navy-dark); }
 .bl-caption.wrong { color: var(--danger); }
 

@@ -44,6 +44,12 @@ apps-script/Code.gs   สคริปต์ฝั่ง Google Sheets
 4. กด Deploy, อนุญาตสิทธิ์ แล้วคัดลอก **Web app URL**
 5. วาง URL ลงใน `js/config.js` ที่ `SHEETS_ENDPOINT`
 
+ถ้าสร้างสคริปต์จาก script.google.com โดยตรง (ไม่ได้สร้างจากในชีต) สคริปต์จะสร้างชีตชื่อ **HR-Test Results**
+ให้เองใน Google Drive ตอนมีผลแรกเข้ามา หรือใส่ ID ของชีตที่ต้องการในตัวแปร `SPREADSHEET_ID` ใน Code.gs ก็ได้
+เปิด URL ที่ลงท้าย `/exec` ในเบราว์เซอร์จะบอกว่าผลถูกบันทึกลงชีตไหน
+
+**หลังแก้ Code.gs ทุกครั้ง** ต้อง Deploy → Manage deployments → ✎ → Version: **New version** → Deploy ไม่งั้น URL เดิมจะยังรันโค้ดเก่า
+
 ผลสอบจะถูกเพิ่มเป็นแถวในชีต `Results` (สร้าง header ให้อัตโนมัติ) คอลัมน์ `raw_json` เก็บคำตอบดิบทุกส่วน
 รวมถึงข้อความที่ผู้สมัครพิมพ์และ log การฝ่าฝืน
 

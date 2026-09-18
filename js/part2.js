@@ -12,8 +12,10 @@ window.HR_PARTS.part2 = {
   },
   render(cfg, container) {
     const full = cfg.PART2.subject + "\n\n" + cfg.PART2.body;
+    document.querySelector(".container").classList.add("wide");
     container.innerHTML = `
-      <div class="instructions">
+      <div class="p2-layout">
+      <div class="instructions p2-instructions">
         <p style="margin:0 0 8px">พิมพ์ข้อความด้านล่างนี้ให้หน้าตาเหมือนกัน <b>100%</b> และส่งไปที่เมล <b>${cfg.PART2.to}</b> พร้อม CC ไปที่ <b>${cfg.PART2.cc}</b></p>
         <div class="email-target">${escapeHtml(full)}</div>
       </div>
@@ -41,6 +43,7 @@ window.HR_PARTS.part2 = {
           <div class="gmail-tools"><span>Aa</span><span>✎</span><span>📎</span><span>🔗</span><span>☺</span><span>△</span><span>▣</span><span>🔒</span><span>✒</span><span>📅</span><span>⋮</span></div>
           <div class="gmail-trash">🗑</div>
         </div>
+      </div>
       </div>`;
     const state = { ccOpened: false, bccOpened: false };
     const ccBtn = container.querySelector("#p2-cc-btn");
@@ -62,6 +65,7 @@ window.HR_PARTS.part2 = {
     return { submitBtn: container.querySelector("#p2-send"), confirmText: "ยืนยันการส่งอีเมลนี้?" };
   },
   collect(cfg, container) {
+    document.querySelector(".container").classList.remove("wide");
     const body = container.querySelector("#p2-body");
     return {
       to: container.querySelector("#p2-to").value,
