@@ -14,7 +14,7 @@ var SHEET_NAME = "Results";
 var COLUMNS = [
   "timestamp", "name", "phone",
   "p1_wpm", "p1_netWpm", "p1_accuracy", "p1_completion", "p1_timeUsed",
-  "p2_to_ok", "p2_cc_ok", "p2_subject_ok", "p2_body_ok", "p2_body_similarity", "p2_timeUsed",
+  "p2_to_ok", "p2_cc_ok", "p2_body_ok", "p2_body_similarity", "p2_timeUsed",
   "p3_fixed", "p3_missed", "p3_damaged", "p3_total", "p3_score", "p3_timeUsed",
   "p4_correct", "p4_total", "p4_score", "p4_timeUsed",
   "violations_paste", "violations_tabSwitch",

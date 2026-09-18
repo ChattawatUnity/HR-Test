@@ -4,19 +4,19 @@ window.HR_PARTS.part2 = {
   id: "part2",
   title: "พิมพ์อีเมลภาษาอังกฤษ",
   intro(cfg) {
-    const full = cfg.PART2.subject + "\n\n" + cfg.PART2.body;
+    const full = cfg.PART2.body;
     return `
-      <p>พิมพ์ข้อความด้านล่างนี้ให้หน้าตาเหมือนกัน <b>100%</b> และส่งไปที่เมล <b>${cfg.PART2.to}</b> พร้อม CC ไปที่ <b>${cfg.PART2.cc}</b></p>
+      <p>พิมพ์ข้อความด้านล่างนี้ลงในเนื้อหาอีเมลให้หน้าตาเหมือนกัน <b>100%</b> (ไม่ต้องใส่ Subject) และส่งไปที่เมล <b>${cfg.PART2.to}</b> พร้อม CC ไปที่ <b>${cfg.PART2.cc}</b></p>
       <div class="email-target">${escapeHtml(full)}</div>
       <p class="muted" style="margin:10px 0 0">เวลา ${Math.round(cfg.TIME_LIMITS.part2 / 60)} นาที เริ่มจับเวลาเมื่อกด "เริ่ม" — กดปุ่ม Send ในหน้าจอเพื่อส่งคำตอบ</p>`;
   },
   render(cfg, container) {
-    const full = cfg.PART2.subject + "\n\n" + cfg.PART2.body;
+    const full = cfg.PART2.body;
     document.querySelector(".container").classList.add("wide");
     container.innerHTML = `
       <div class="p2-layout">
       <div class="instructions p2-instructions">
-        <p style="margin:0 0 8px">พิมพ์ข้อความด้านล่างนี้ให้หน้าตาเหมือนกัน <b>100%</b> และส่งไปที่เมล <b>${cfg.PART2.to}</b> พร้อม CC ไปที่ <b>${cfg.PART2.cc}</b></p>
+        <p style="margin:0 0 8px">พิมพ์ข้อความด้านล่างนี้ลงในเนื้อหาอีเมลให้หน้าตาเหมือนกัน <b>100%</b> <u>ไม่ต้องใส่ Subject</u> และส่งไปที่เมล <b>${cfg.PART2.to}</b> พร้อม CC ไปที่ <b>${cfg.PART2.cc}</b></p>
         <div class="email-target">${escapeHtml(full)}</div>
       </div>
       <div class="gmail">

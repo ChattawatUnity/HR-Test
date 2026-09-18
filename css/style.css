@@ -64,7 +64,7 @@ textarea { resize: vertical; }
 .p2-layout { display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; align-items: start; }
 @media (max-width: 1000px) { .p2-layout { grid-template-columns: 1fr; } }
 .p2-instructions { margin: 0; position: sticky; top: 16px; }
-.email-target { font-family: "Consolas", "Courier New", monospace; white-space: pre-wrap; background: #fff; border: 1px dashed var(--border); border-radius: 8px; padding: 14px 16px; user-select: none; -webkit-user-select: none; }
+.email-target { font-family: "Google Sans", Roboto, Arial, sans-serif; font-size: 15px; line-height: 1.5; color: #1f1f1f; white-space: pre-wrap; background: #fff; border: 1px dashed var(--border); border-radius: 8px; padding: 14px 16px; user-select: none; -webkit-user-select: none; }
 .gmail { border: 1px solid #dadce0; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.18); background: #fff; font-family: "Google Sans", Roboto, Arial, sans-serif; overflow: hidden; }
 .gmail-head { background: #f2f6fc; padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; font-size: 15px; color: #041e49; }
 .gmail-head .win { color: #444746; letter-spacing: 6px; font-size: 14px; }
@@ -105,6 +105,8 @@ textarea { resize: vertical; }
 .bl-cell textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(28,58,110,.25); }
 .bl-cell.editing .val { display: none; }
 .bl-cell.editing textarea { display: block; }
+.bl-cell.changed .val { color: var(--danger); }
+.bl-cell.changed textarea { color: var(--danger); }
 .bl-caption { font-weight: 700; margin-bottom: 8px; color: var(--navy-dark); }
 .bl-caption.wrong { color: var(--danger); }
 

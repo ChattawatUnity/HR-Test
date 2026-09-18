@@ -189,7 +189,7 @@
       name: state.candidate.name,
       phone: state.candidate.phone,
       p1_wpm: r.part1.wpm, p1_netWpm: r.part1.netWpm, p1_accuracy: r.part1.accuracy, p1_completion: r.part1.completion, p1_timeUsed: r.part1.secondsUsed,
-      p2_to_ok: r.part2.toOk, p2_cc_ok: r.part2.ccOk, p2_subject_ok: r.part2.subjectOk, p2_body_ok: r.part2.bodyOk, p2_body_similarity: r.part2.bodySimilarity, p2_timeUsed: r.part2.secondsUsed,
+      p2_to_ok: r.part2.toOk, p2_cc_ok: r.part2.ccOk, p2_body_ok: r.part2.bodyOk, p2_body_similarity: r.part2.bodySimilarity, p2_timeUsed: r.part2.secondsUsed,
       p3_fixed: r.part3.fixed, p3_missed: r.part3.missed, p3_damaged: r.part3.damaged, p3_total: r.part3.total, p3_score: r.part3.score, p3_timeUsed: r.part3.secondsUsed,
       p4_correct: r.part4.correct, p4_total: r.part4.total, p4_score: r.part4.score, p4_timeUsed: r.part4.secondsUsed,
       violations_paste: pasteCount, violations_tabSwitch: tabCount,

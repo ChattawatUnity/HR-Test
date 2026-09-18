@@ -69,18 +69,16 @@
     };
   }
 
-  /* Part 2 */
+  /* Part 2 — ตรวจ To, Cc และเนื้อหา (ไม่ตรวจ Subject) */
   function scorePart2(answer, expected) {
     const eq = (a, b) => String(a || "").trim().toLowerCase() === String(b || "").trim().toLowerCase();
     const bodyA = normalizeText(answer.body), bodyE = normalizeText(expected.body);
-    const subjA = normalizeText(answer.subject), subjE = normalizeText(expected.subject);
     const toOk = eq(answer.to, expected.to);
     const ccOk = eq(answer.cc, expected.cc);
-    const subjectOk = subjA === subjE;
     const bodyOk = bodyA === bodyE;
     const bodySimilarity = +similarity(bodyA, bodyE).toFixed(4);
-    const points = (toOk ? 1 : 0) + (ccOk ? 1 : 0) + (subjectOk ? 1 : 0) + (bodyOk ? 1 : 0);
-    return { toOk, ccOk, ccOpened: !!answer.ccOpened, subjectOk, bodyOk, bodySimilarity, points, maxPoints: 4, score: +(points / 4).toFixed(4) };
+    const points = (toOk ? 1 : 0) + (ccOk ? 1 : 0) + (bodyOk ? 1 : 0);
+    return { toOk, ccOk, ccOpened: !!answer.ccOpened, bodyOk, bodySimilarity, points, maxPoints: 3, score: +(points / 3).toFixed(4) };
   }
 
   /* Part 3 */

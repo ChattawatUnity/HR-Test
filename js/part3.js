@@ -10,17 +10,19 @@ window.HR_PARTS.part3 = {
       <ul>
         <li>จะแสดงเอกสาร B/L สองฉบับ: <b>ด้านซ้ายคือต้นฉบับ</b> (อ่านอย่างเดียว) และ <b>ด้านขวาคือฉบับที่มีข้อผิดพลาด</b></li>
         <li>ตรวจสอบทุกช่องของฉบับด้านขวา <b>คลิกที่ช่อง</b> ที่ต้องการแก้ พิมพ์ให้ตรงกับต้นฉบับ แล้วคลิกที่อื่นเพื่อปิดช่องกรอก</li>
-        <li>ระบบไม่บอกว่ามีกี่จุดและอยู่ตรงไหน ให้แก้เฉพาะจุดที่ผิดเท่านั้น</li>
+        <li>ฉบับด้านขวามีช่องที่ผิดอยู่ <b>${countWrong(cfg)} ช่อง</b> (บางช่องอาจผิดมากกว่า 1 จุด) ให้แก้เฉพาะช่องที่ผิดเท่านั้น</li>
+        <li>ช่องที่แก้ไขแล้วจะแสดงเป็น<span style="color:#b91c1c;font-weight:700">ตัวอักษรสีแดง</span></li>
         <li>เวลา ${Math.round(cfg.TIME_LIMITS.part3 / 60)} นาที เริ่มจับเวลาเมื่อกด "เริ่ม"</li>
       </ul>`;
   },
   render(cfg, container) {
-    const answers = Object.assign({}, cfg.BL_ORIGINAL, cfg.BL_WRONG);
+    const initial = Object.assign({}, cfg.BL_ORIGINAL, cfg.BL_WRONG);
+    const answers = Object.assign({}, initial);
     this._answers = answers;
     container.innerHTML = `
       <div class="bl-compare">
         <div><div class="bl-caption">ต้นฉบับ (ORIGINAL)</div>${renderBL(cfg, cfg.BL_ORIGINAL, false)}</div>
-        <div><div class="bl-caption wrong">ฉบับที่ต้องตรวจแก้ (คลิกช่องเพื่อแก้ไข)</div>${renderBL(cfg, answers, true)}</div>
+        <div><div class="bl-caption wrong">ฉบับที่ต้องตรวจแก้ (คลิกช่องเพื่อแก้ไข — ผิด ${countWrong(cfg)} ช่อง)</div>${renderBL(cfg, answers, true)}</div>
       </div>
       <div class="actions"><button class="btn btn-primary btn-inline" id="p3-submit">ส่ง</button></div>`;
     document.querySelector(".container").classList.add("wide");
@@ -40,6 +42,7 @@ window.HR_PARTS.part3 = {
       const close = () => {
         answers[key] = ta.value;
         val.textContent = ta.value;
+        cell.classList.toggle("changed", ta.value !== initial[key]);
         cell.classList.remove("editing");
       };
       cell.addEventListener("click", e => { if (e.target !== ta) open(); });
@@ -58,6 +61,10 @@ window.HR_PARTS.part3 = {
     return HR_SCORING.scorePart3(answer, cfg.BL_ORIGINAL, cfg.BL_WRONG);
   },
 };
+
+function countWrong(cfg) {
+  return Object.keys(cfg.BL_WRONG).filter(k => HR_SCORING.normalizeField(cfg.BL_WRONG[k]) !== HR_SCORING.normalizeField(cfg.BL_ORIGINAL[k])).length;
+}
 
 function renderBL(cfg, doc, editable) {
   const fullWidth = new Set(["description", "totalInWords", "packingPremises", "signature"]);

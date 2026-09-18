@@ -26,8 +26,10 @@ window.HR_CONFIG = {
   PART2: {
     to: "test_customer@companyname.co.th",
     cc: "unity@unityagency.co.th",
-    subject: "Notice of Draft B/L [UNITY]",
+    /* ไม่ตรวจ Subject — ข้อความทั้งหมดต้องพิมพ์ในเนื้อหาอีเมล */
     body:
+"Notice of Draft B/L [UNITY]\n" +
+"\n" +
 "1. VVD : JHKI924OW\n" +
 "\n" +
 "2. B/L Number : BKKE11111111\n" +
@@ -44,13 +46,11 @@ window.HR_CONFIG = {
   /* ---------------- Part 3 : จับผิดเอกสาร B/L ---------------- */
   /* ต้นฉบับ (แกะจาก PDF หน้า 1) — key = ชื่อช่อง, value = ค่าที่ถูกต้อง */
   BL_FIELDS: [
-    /* [key, label, rows(1 = input, >1 = textarea)] */
-    ["shipper",        "SHIPPER",                          5],
+    /* [key, label, rows(จำนวนบรรทัดของช่อง)] */
+    ["shipper",        "SHIPPER",                          4],
     ["blNo",           "B/L NO.",                          1],
-    ["bookingRef",     "R/C / BOOKING REF.",               1],
     ["consignee",      "CONSIGNEE",                        2],
-    ["exportRef",      "EXPORT REFERENCES",                1],
-    ["notifyParty",    "NOTIFY PARTY",                     2],
+    ["notifyParty",    "NOTIFY PARTY",                     1],
     ["serviceRequired","SERVICE REQUIRED",                 1],
     ["feederVessel",   "FEEDER VESSEL",                    1],
     ["motherVessel",   "MOTHER VESSEL / VOYAGE",           1],
@@ -69,56 +69,49 @@ window.HR_CONFIG = {
     ["totalInWords",   "TOTAL NO. OF CONTAINERS OR PACKAGES (IN WORDS)", 1],
     ["freightPayable", "FREIGHT PAYABLE AT",               1],
     ["noOfOriginal",   "NUMBER OF ORIGINAL B/L",           1],
-    ["packingPremises","PACKING PREMISES (FCL CARGO ONLY)",1],
     ["placeOfIssue",   "PLACE AND DATE OF ISSUE",          1],
     ["remarks",        "REMARKS",                          1],
     ["signature",      "NAME & SIGNATURE OF SHIPPER / AGENT", 1],
   ],
 
   BL_ORIGINAL: {
-    shipper:          "SARA FARMS CO., LTD.\n44M MOO 11, NAWAMIN ROAD, KANNAYAW,\nKANNAYAW DISTRICT, BANGKOK 10230, THAILAND.",
+    shipper:          "SAHA FARMS CO., LTD.\n44/4 MOO 11, NAWAMIN ROAD, KANNAYAW,\nKANNAYAW DISTRICT, BANGKOK 10230, THAILAND.",
     blNo:             "BKK235632",
-    bookingRef:       "-",
-    consignee:        "TO ORDER OF SIAM COMMERCIAL BANK PUBLIC COMPANY LIMITED",
-    exportRef:        "SHIPMENT BKK235632",
-    notifyParty:      "HANWA CO., LTD. TOKYO.\n(FAX NO. 03-3544-2050)",
+    consignee:        "TO ORDER OF SIAM COMERCIAL BANK PUBLIC COMPANY LIMITED",
+    notifyParty:      "HANWA CO., LTD. TOKYO.",
     serviceRequired:  "CY/CY",
-    feederVessel:     "-",
-    motherVessel:     "SATSUKI V. 096 N",
+    feederVessel:     "SATSUKI V.096N",
+    motherVessel:     "",
     portOfLoading:    "BANGKOK, THAILAND",
     placeOfAcceptance:"BANGKOK, THAILAND",
     portOfDischarge:  "OSAKA, JAPAN",
     placeOfDelivery:  "OSAKA, JAPAN",
     finalDestination: "OSAKA, JAPAN",
     bkkDestination:   "-",
-    containerNo:      "TRLU 1052114",
+    containerNo:      "TRLU1052114",
     sealNo:           "SPIC172554",
-    marks:            "TC IN SQUARE\nHAN-04/20038",
+    marks:            "TC IN SQUARE\nHAN-04/2003S",
     packages:         "CARTONS 1,000",
-    description:      "FROZEN CHICKEN (GALLUS DOMESTICUS)\n(ONE THOUSAND CARTONS ONLY)\nSTOWED IN REFRIGERATED CONTAINER AT\n-18 DEGREE CELCIUS\nFREIGHT PREPAID\nB/L ON BOARD 18/2/2003",
+    description:      "FROZEN CHICKEN (GALLUS DOMESTICUS)\n(ONE THOUSAND CARTONS ONLY)\nSTOWED IN REFRIGERATED CONTAINER AT\n-18 DEGREE CELCIUS\nFREIGHT PREPAID\nB/L ON BOARD 16/2/2026",
     grossWeight:      "G.W. 12.500 M/TONS\nN.W. 12.000 M/TONS",
     totalInWords:     "ONE THOUSAND CARTONS ONLY",
     freightPayable:   "PREPAID",
     noOfOriginal:     "3 (THREE)",
-    packingPremises:  "Contact Person: - | Tel: - | Packing Time: -",
     placeOfIssue:     "BANGKOK, THAILAND",
-    remarks:          "Loading On Board Date: 18/02/2003",
+    remarks:          "Loading On Board Date: 16/02/2026",
     signature:        "UNITY AGENCY CO., LTD.",
   },
 
-  /* ช่องที่ทำให้ผิดในฉบับที่ผู้สมัครต้องแก้ (ค่าเริ่มต้นแกะจาก PDF หน้า 2)
-     แก้/เพิ่ม/ลบได้ตามต้องการ: key ต้องตรงกับ BL_ORIGINAL */
+  /* ช่องที่ทำให้ผิดในฉบับที่ผู้สมัครต้องแก้ (key ต้องตรงกับ BL_ORIGINAL)
+     จำนวนช่องที่ผิดจะถูกแสดงในโจทย์อัตโนมัติ */
   BL_WRONG: {
-    shipper:          "SAHA FARMS CO., LTD.\n44/4 MOO 11, NAWAMIN ROAD, KANAYAW,\nKANAYAW DISTRICTS, BANGKOK 10230, THAILAND.",
+    shipper:          "SARA FARMS CO., LTD.\n44/4 MOO 11, NAWAMIN ROAD, KANNAYAW,\nKANNAYAW DISTRICT, BANGKOK 10320, THAILAND.",
     blNo:             "BKK236532",
-    consignee:        "TO ORDER OF SIAM COMERCIAL BANK PUBLIC COMPANY LIMITED",
-    exportRef:        "SHIPMENT BKK236532",
-    notifyParty:      "HANWA CO LTD. TOKYO.\n(FAX NO. 03-3544-2050)",
-    motherVessel:     "SASUKI V. 096 N",
-    placeOfAcceptance:"BANKGOK, THAILAND",
-    containerNo:      "TRLU 1052119",
-    marks:            "TC IN SQUARE\nHAN-04/2003",
-    description:      "FROZEN CHICKEN (GALLUS DOMESTICUS)\n(ONE THOUSAND CARTONS ONLY)\nSTOWED IN REFRIGERATED CONTAINER AT\n-16 DEGREE CELCIUS\nFREIGHT PREPAID\nB/L ON BOARD 18/2/2003",
+    serviceRequired:  "CY/CFS",
+    portOfLoading:    "BANGKOK, THALIAND",
+    marks:            "TC IN SQUARE\nHAN-04/20038",
+    description:      "FROZEN CHICKEN (GALLUS DOMESTICUS)\n(ONE THOUSAND CARTONS ONLY)\nSTOWED IN REFRIGERATED CONTAINER AT\n-18 DEGREE CELCIUS\nFREIGHT PREPAID\nB/L ON BOARD 16/2/2562",
+    placeOfIssue:     "BANGK0K, THAILAND",
   },
 
   /* ---------------- Part 4 : ศัพท์ shipping ---------------- */
