@@ -5,7 +5,7 @@ window.HR_CONFIG = {
 
   /* URL ของ Google Apps Script Web App (ดูวิธีตั้งค่าใน README.md)
      ปล่อยว่างไว้ = ไม่ส่งผล แสดงปุ่มดาวน์โหลดไฟล์ผลแทน */
-  SHEETS_ENDPOINT: "https://script.google.com/macros/s/AKfycbwnZP9nEPyAcLs4daVhy85BT8aifBbkyHY2A--pBRNtoKyaVHgx77r_kYOYzkztCY0Y/exec",
+  SHEETS_ENDPOINT: "https://script.google.com/macros/s/AKfycbzuBHyIwt5VlcFmDjI8RG1H7JJ_tXEFum8AAfUIxghQ2hhr7tUlB51yTAeSm-i3SZtO/exec",
 
   /* เวลาจำกัดแต่ละ part (วินาที) */
   TIME_LIMITS: {
