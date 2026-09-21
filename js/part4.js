@@ -13,9 +13,9 @@ window.HR_PARTS.part4 = {
   render(cfg, container) {
     container.innerHTML = cfg.PART4.map((q, i) => `
       <div class="q">
-        <div class="qt">${i + 1}. ${escapeHtml(q.q)}</div>
+        <div class="qt"><span class="num">${i + 1}</span>${escapeHtml(q.q)}</div>
         <div class="choices">
-          ${q.choices.map((c, j) => `<label><input type="radio" name="q${i}" value="${j}"> ${escapeHtml(c)}</label>`).join("")}
+          ${q.choices.map((c, j) => `<label><input type="radio" name="q${i}" value="${j}"><span class="letter">${"ABCD"[j]}</span><span>${escapeHtml(c)}</span></label>`).join("")}
         </div>
       </div>`).join("") +
       `<div class="actions"><button class="btn btn-primary btn-inline" id="p4-submit">ส่ง</button></div>`;

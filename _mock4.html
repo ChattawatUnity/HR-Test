@@ -1,0 +1,21 @@
+<!DOCTYPE html><html lang="th"><head><meta charset="UTF-8"><link rel="stylesheet" href="css/style.css">
+<style>
+body{padding:24px} .mock{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin-bottom:20px}
+.mock h2{margin:0 0 12px;font-size:18px;color:var(--navy-dark)}
+/* แบบ 2: ปุ่ม pill เรียงแถว */
+.s2 .choices{display:flex;flex-wrap:wrap;gap:10px}
+.s2 .choices label{border-radius:999px;padding:10px 18px;gap:8px}
+.s2 .choices .letter{display:none}
+/* แบบ 3: รายการแนวตั้ง มีวงกลมเช็ก */
+.s3 .choices{grid-template-columns:1fr;gap:8px}
+.s3 .choices label{border-radius:10px;padding:11px 14px}
+.s3 .choices .letter{width:22px;height:22px;border-radius:50%;border:2px solid #9fb0cc;background:#fff;font-size:0}
+.s3 .choices label:has(input:checked) .letter{border-color:var(--navy-dark);background:var(--navy-dark);box-shadow:inset 0 0 0 4px #fff}
+</style></head><body>
+<div class="mock"><h2>แบบ 1 — การ์ด 2 คอลัมน์ มีตัวอักษร A/B/C/D (ค่าเริ่มต้นที่ใส่ไว้ตอนนี้)</h2><div class="q s1" id="q1"></div></div>
+<div class="mock"><h2>แบบ 2 — ปุ่มกลม (pill) เรียงแถวเดียว</h2><div class="q s2" id="q2"></div></div>
+<div class="mock"><h2>แบบ 3 — รายการแนวตั้ง มีวงกลมติ๊ก</h2><div class="q s3" id="q3"></div></div>
+<script>
+const q={q:"Port of Discharge",choices:["เส้นทางเดินเรือ","ท่าเรือต้นทาง","ท่าเรือปลายทาง","ท่าเรือผ่านทาง"]};
+for(const n of [1,2,3]){document.getElementById("q"+n).innerHTML=`<div class="qt"><span class="num">3</span>${q.q}</div><div class="choices">${q.choices.map((c,j)=>`<label><input type="radio" name="m${n}" value="${j}" ${j==2?"checked":""}><span class="letter">${"ABCD"[j]}</span><span>${c}</span></label>`).join("")}</div>`;}
+</script></body></html>

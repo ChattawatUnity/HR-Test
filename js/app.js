@@ -166,7 +166,7 @@
         <h2>ทำแบบทดสอบครบแล้ว</h2>
         <p>ขอบคุณคุณ <b>${escapeHtml(state.candidate.name)}</b> ที่ทำแบบทดสอบ ผลของคุณถูกบันทึกไว้แล้ว</p>
         <div class="summary-grid">
-          <div class="stat"><div class="k">Part 1 พิมพ์ไทย</div><div class="v">${r.part1.wpm} WPM</div><div class="muted">ความถูกต้อง ${pct(r.part1.accuracy)}</div></div>
+          <div class="stat"><div class="k">Part 1 พิมพ์ข้อความ</div><div class="v">${r.part1.wpm} WPM</div><div class="muted">ความถูกต้อง ${pct(r.part1.accuracy)}</div></div>
           <div class="stat"><div class="k">Part 2 อีเมล</div><div class="v">${r.part2.points}/${r.part2.maxPoints}</div><div class="muted">เนื้อหาตรง ${pct(r.part2.bodySimilarity)}</div></div>
           <div class="stat"><div class="k">Part 3 ตรวจเอกสาร</div><div class="v">${r.part3.fixed}/${r.part3.total}</div><div class="muted">แก้ผิดเพิ่ม ${r.part3.damaged} ช่อง</div></div>
           <div class="stat"><div class="k">Part 4 คำศัพท์</div><div class="v">${r.part4.correct}/${r.part4.total}</div></div>

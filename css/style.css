@@ -84,40 +84,64 @@ textarea { resize: vertical; }
 .gmail-tools span { opacity: .8; }
 .gmail-trash { margin-left: auto; color: #444746; font-size: 18px; }
 
-/* Part 3: B/L compare */
+/* Part 3: B/L compare — ฟอร์มโครงเดียวกับ B/L มาตรฐาน */
 .bl-compare { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-@media (max-width: 1000px) { .bl-compare { grid-template-columns: 1fr; } }
-.bl { border: 2px solid #111; background: #fff; font-family: Arial, Helvetica, sans-serif; }
-.bl-grid { display: grid; grid-template-columns: 1fr 1fr; }
-.bl-cell { position: relative; border: 1px solid #111; padding: 4px 6px 6px; }
-.bl-cell.full { grid-column: 1 / -1; }
-.bl-cell .lbl { font-size: 9.5px; line-height: 12px; height: 12px; font-weight: 700; color: #333; text-transform: uppercase; margin-bottom: 2px; }
+@media (max-width: 1100px) { .bl-compare { grid-template-columns: 1fr; } }
+.bl { --line: 1px solid #222; border: 2px solid #222; background: #fff; font-family: Arial, Helvetica, sans-serif; color: #111; }
+.bl-top { display: grid; grid-template-columns: 1fr 1fr; }
+.bl-left, .bl-right { display: flex; flex-direction: column; }
+.bl-left { border-right: var(--line); }
+.bl-right .bl-fill { flex: 1; }
+.bl-title { text-align: center; font-weight: 700; font-size: 17px; letter-spacing: 3px; padding: 10px 6px; border-bottom: var(--line); background: #f3f4f6; }
+.bl-cell.bl-no .val, .bl-cell.bl-no textarea { font-size: 14px; }
+.bl-row4 { display: grid; grid-template-columns: repeat(4, 1fr); }
+.bl-row3 { display: grid; grid-template-columns: repeat(4, 1fr); }
+.bl-row3 .span2 { grid-column: span 2; }
+.bl-body-head { display: grid; grid-template-columns: 1.1fr .7fr 2fr 1fr; border-bottom: var(--line); background: #f3f4f6; }
+.bl-body-head > div { font-size: 8.5px; font-weight: 700; text-align: center; padding: 4px 4px; border-right: var(--line); line-height: 1.3; }
+.bl-body-head > div:last-child { border-right: 0; }
+.bl-body { display: grid; grid-template-columns: 1.1fr .7fr 2fr 1fr; min-height: 200px; border-bottom: var(--line); }
+.bl-body-col { border-right: var(--line); display: flex; flex-direction: column; }
+.bl-body-col:last-child { border-right: 0; }
+.bl-body .bl-cell { border: 0; border-bottom: 0; }
+.bl-cell { position: relative; border-right: var(--line); border-bottom: var(--line); padding: 3px 6px 5px; min-width: 0; }
+.bl-row4 .bl-cell:nth-child(4n), .bl-row3 .bl-cell:last-child, .bl-right .bl-cell { border-right: 0; }
+.bl-right .bl-cell:last-child { border-bottom: 0; }
+.bl-row3:last-child .bl-cell { border-bottom: 0; }
+.bl-cell .lbl { font-size: 8.5px; line-height: 11px; height: 11px; font-weight: 700; color: #333; text-transform: uppercase; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bl-cell.nolbl .lbl { display: none; }
 /* .val และ textarea ใช้กล่อง/ฟอนต์/บรรทัดเดียวกันทุกประการ ให้สองฝั่งตรงกันเป๊ะ */
 .bl-cell .val, .bl-cell textarea {
-  display: block; box-sizing: border-box; width: 100%; margin: 0; padding: 2px 4px;
-  font-family: Arial, Helvetica, sans-serif; font-size: 12.5px; font-weight: 600; line-height: 18px;
-  height: calc(var(--rows, 1) * 18px + 4px); white-space: pre-wrap; overflow: hidden; border: 1px solid transparent; border-radius: 3px;
+  display: block; box-sizing: border-box; width: 100%; margin: 0; padding: 2px 3px;
+  font-family: "Courier New", Courier, monospace; font-size: 12px; font-weight: 700; line-height: 17px;
+  height: calc(var(--rows, 1) * 17px + 4px); white-space: pre-wrap; overflow: hidden; border: 1px solid transparent; border-radius: 2px;
+  word-break: break-word;
 }
 .bl-cell .val { user-select: none; -webkit-user-select: none; }
-.bl.editable .bl-cell { cursor: text; }
-.bl.editable .bl-cell:hover .val { background: #f4f6fa; }
+.bl-cell .val .ins { color: var(--danger); }
+.bl.editable .bl-cell[data-key] { cursor: text; }
+.bl.editable .bl-cell[data-key]:hover .val { background: #f4f6fa; }
 .bl-cell textarea { display: none; resize: none; background: #fffbe6; border-color: var(--navy); color: var(--text); }
 .bl-cell textarea:focus { outline: none; box-shadow: 0 0 0 2px rgba(28,58,110,.25); }
 .bl-cell.editing .val { display: none; }
 .bl-cell.editing textarea { display: block; }
-.bl-cell.changed .val { color: var(--danger); }
-.bl-cell.changed textarea { color: var(--danger); }
 .bl-caption { font-weight: 700; margin-bottom: 8px; color: var(--navy-dark); }
 .bl-caption.wrong { color: var(--danger); }
 
-/* Part 4 */
-.q { border-bottom: 1px solid var(--border); padding: 14px 0; }
-.q:last-child { border-bottom: 0; }
-.q .qt { font-weight: 700; margin-bottom: 8px; }
-.q .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 18px; }
+/* Part 4 — ตัวเลือกแบบการ์ด */
+.q { padding: 18px 0; border-bottom: 1px solid var(--border); }
+.q:last-of-type { border-bottom: 0; }
+.q .qt { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 17px; margin-bottom: 12px; }
+.q .qt .num { background: var(--navy-dark); color: #fff; font-size: 13px; width: 28px; height: 28px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.q .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 @media (max-width: 700px) { .q .choices { grid-template-columns: 1fr; } }
-.q .choices label { font-weight: 400; margin: 0; display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 6px 8px; border-radius: 8px; }
-.q .choices label:hover { background: #f4f6fa; }
+.q .choices label { position: relative; margin: 0; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 2px solid var(--border); border-radius: 12px; background: #fff; transition: border-color .12s, background .12s, box-shadow .12s; }
+.q .choices label:hover { border-color: #9fb0cc; background: #f8fafc; }
+.q .choices input { position: absolute; opacity: 0; width: 0; height: 0; }
+.q .choices .letter { width: 30px; height: 30px; border-radius: 8px; background: #eef1f6; color: var(--navy-dark); font-weight: 700; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; }
+.q .choices label:has(input:checked) { border-color: var(--navy-dark); background: #eaf0fb; box-shadow: 0 0 0 3px rgba(28,58,110,.15); }
+.q .choices label:has(input:checked) .letter { background: var(--navy-dark); color: #fff; }
+.q .choices label:has(input:focus-visible) { outline: 2px solid var(--navy); outline-offset: 2px; }
 
 /* Summary */
 .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
