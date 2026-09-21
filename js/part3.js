@@ -10,7 +10,7 @@ window.HR_PARTS.part3 = {
     return `
       <ul>
         <li>จะแสดงเอกสาร B/L สองฉบับ: <b>ด้านซ้ายคือต้นฉบับ</b> (อ่านอย่างเดียว) และ <b>ด้านขวาคือฉบับที่มีข้อผิดพลาด</b></li>
-        <li>ตรวจสอบทุกช่องของฉบับด้านขวา <b>คลิกที่ช่อง</b> ที่ต้องการแก้ พิมพ์ให้ตรงกับต้นฉบับ แล้วคลิกที่อื่นเพื่อปิดช่องกรอก</li>
+        <li>ตรวจสอบทุกช่องของฉบับด้านขวา <b>คลิกตรงตำแหน่งที่ต้องการแก้</b> พิมพ์ให้ตรงกับต้นฉบับ แล้วกด <b>Enter</b> หรือคลิกที่อื่นเพื่อปิดช่องกรอก (Shift+Enter = ขึ้นบรรทัดใหม่)</li>
         <li>ฉบับด้านขวามีช่องที่ผิดอยู่ <b>${countWrong(cfg)} ช่อง</b> (บางช่องอาจผิดมากกว่า 1 จุด) ให้แก้เฉพาะช่องที่ผิดเท่านั้น</li>
         ${cfg.PART3_LIVE_FEEDBACK
           ? `<li>ตัวอักษรที่พิมพ์แก้ไขจะเป็น<span style="color:#b91c1c;font-weight:700">สีแดง</span> ถ้าช่องนั้นยังไม่ตรงต้นฉบับ และเป็น<span style="color:#047857;font-weight:700">สีเขียว</span> เมื่อช่องนั้นตรงแล้ว มีตัวนับบอกว่าแก้ถูกแล้วกี่ช่อง</li>`
@@ -50,12 +50,14 @@ window.HR_PARTS.part3 = {
       const key = cell.dataset.key;
       const val = cell.querySelector(".val");
       const ta = cell.querySelector("textarea");
-      const open = () => {
+      const open = (e) => {
         if (cell.classList.contains("editing")) return;
+        const pos = caretOffsetFromClick(e, val);
         ta.value = answers[key];
         cell.classList.add("editing");
         ta.focus();
-        ta.setSelectionRange(ta.value.length, ta.value.length);
+        const at = pos == null ? ta.value.length : Math.min(pos, ta.value.length);
+        ta.setSelectionRange(at, at);
       };
       const close = () => {
         answers[key] = ta.value;
@@ -66,9 +68,12 @@ window.HR_PARTS.part3 = {
         }
         updateCounter();
       };
-      cell.addEventListener("click", e => { if (e.target !== ta) open(); });
+      cell.addEventListener("mousedown", e => { if (e.target !== ta) { e.preventDefault(); open(e); } });
       ta.addEventListener("blur", close);
-      ta.addEventListener("keydown", e => { if (e.key === "Escape") ta.blur(); });
+      ta.addEventListener("keydown", e => {
+        if (e.key === "Escape") { e.preventDefault(); ta.blur(); }
+        else if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); ta.blur(); }
+      });
     });
     return { submitBtn: container.querySelector("#p3-submit"), confirmText: "ยืนยันการส่งคำตอบ Part 3?" };
   },
@@ -87,21 +92,29 @@ function countWrong(cfg) {
   return Object.keys(cfg.BL_WRONG).filter(k => HR_SCORING.normalizeField(cfg.BL_WRONG[k]) !== HR_SCORING.normalizeField(cfg.BL_ORIGINAL[k])).length;
 }
 
-/* ตัวอักษรใน cur ที่ไม่อยู่ใน LCS กับ base = ตัวที่พิมพ์เพิ่ม/แก้ → สีแดง */
+/* ตัวอักษรใน cur ที่ต่างจาก base (พิมพ์เพิ่ม/แก้) → สีแดง */
 function diffHtml(base, cur) {
-  const a = Array.from(base || ""), b = Array.from(cur || "");
   if (base === cur) return escapeHtml(cur);
-  const n = a.length, m = b.length;
-  const dp = Array.from({ length: n + 1 }, () => new Uint16Array(m + 1));
-  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--)
-    dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
-  let i = 0, j = 0, out = "";
-  while (j < m) {
-    if (i < n && a[i] === b[j]) { out += escapeHtml(b[j]); i++; j++; }
-    else if (i < n && dp[i + 1][j] >= dp[i][j + 1]) { i++; }
-    else { out += `<span class="ins">${escapeHtml(b[j])}</span>`; j++; }
+  return HR_SCORING.diffOps(base, cur).filter(o => o.t !== "del")
+    .map(o => o.t === "ins" ? `<span class="ins">${escapeHtml(o.c)}</span>` : escapeHtml(o.c)).join("");
+}
+
+/* หาตำแหน่งตัวอักษรในข้อความจากจุดที่คลิก เพื่อวาง cursor ให้ตรง */
+function caretOffsetFromClick(e, valEl) {
+  if (!e || e.clientX == null) return null;
+  let node = null, offset = 0;
+  if (document.caretPositionFromPoint) {
+    const p = document.caretPositionFromPoint(e.clientX, e.clientY);
+    if (p) { node = p.offsetNode; offset = p.offset; }
+  } else if (document.caretRangeFromPoint) {
+    const r = document.caretRangeFromPoint(e.clientX, e.clientY);
+    if (r) { node = r.startContainer; offset = r.startOffset; }
   }
-  return out;
+  if (!node || !valEl.contains(node)) return null;
+  const pre = document.createRange();
+  pre.selectNodeContents(valEl);
+  pre.setEnd(node, offset);
+  return pre.toString().length;
 }
 
 /* ---------- ฟอร์ม B/L (โครงเดียวกับฟอร์ม A4 มาตรฐาน) ---------- */
@@ -165,3 +178,5 @@ function renderBL(cfg, doc, editable) {
     </div>
   </div>`;
 }
+
+window.HR_RENDER_BL = renderBL;

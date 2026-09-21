@@ -10,6 +10,9 @@
   --warn-border: #f0d78c;
   --warn-text: #7a5a00;
   --danger: #b91c1c;
+  --red-bright: #ff1a1a;
+  --green: #059669;
+  --orange: #d97706;
   --gmail-blue: #0b57d0;
 }
 * { box-sizing: border-box; }
@@ -26,7 +29,7 @@ body {
 .hidden { display: none !important; }
 
 .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
-.container.wide { max-width: 1400px; }
+.container.wide { max-width: 1900px; }
 
 .notice { background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn-text); border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; }
 .notice h2 { margin: 0 0 8px; font-size: 16px; }
@@ -93,14 +96,14 @@ textarea { resize: vertical; }
 .bl-left { border-right: var(--line); }
 .bl-right .bl-fill { flex: 1; }
 .bl-title { text-align: center; font-weight: 700; font-size: 17px; letter-spacing: 3px; padding: 10px 6px; border-bottom: var(--line); background: #f3f4f6; }
-.bl-cell.bl-no .val, .bl-cell.bl-no textarea { font-size: 14px; }
+.bl-cell.bl-no .val, .bl-cell.bl-no textarea { font-size: 17px; }
 .bl-row4 { display: grid; grid-template-columns: repeat(4, 1fr); }
 .bl-row3 { display: grid; grid-template-columns: repeat(4, 1fr); }
 .bl-row3 .span2 { grid-column: span 2; }
 .bl-body-head { display: grid; grid-template-columns: 1.1fr .7fr 2fr 1fr; border-bottom: var(--line); background: #f3f4f6; }
-.bl-body-head > div { font-size: 8.5px; font-weight: 700; text-align: center; padding: 4px 4px; border-right: var(--line); line-height: 1.3; }
+.bl-body-head > div { font-size: 9.5px; font-weight: 700; text-align: center; padding: 4px 4px; border-right: var(--line); line-height: 1.3; }
 .bl-body-head > div:last-child { border-right: 0; }
-.bl-body { display: grid; grid-template-columns: 1.1fr .7fr 2fr 1fr; min-height: 200px; border-bottom: var(--line); }
+.bl-body { display: grid; grid-template-columns: 1.1fr .7fr 2fr 1fr; min-height: 240px; border-bottom: var(--line); }
 .bl-body-col { border-right: var(--line); display: flex; flex-direction: column; }
 .bl-body-col:last-child { border-right: 0; }
 .bl-body .bl-cell { border: 0; border-bottom: 0; }
@@ -108,19 +111,19 @@ textarea { resize: vertical; }
 .bl-row4 .bl-cell:nth-child(4n), .bl-row3 .bl-cell:last-child, .bl-right .bl-cell { border-right: 0; }
 .bl-right .bl-cell:last-child { border-bottom: 0; }
 .bl-row3:last-child .bl-cell { border-bottom: 0; }
-.bl-cell .lbl { font-size: 8.5px; line-height: 11px; height: 11px; font-weight: 700; color: #333; text-transform: uppercase; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bl-cell .lbl { font-size: 9.5px; line-height: 12px; height: 12px; font-weight: 700; color: #333; text-transform: uppercase; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .bl-cell.nolbl .lbl { display: none; }
 /* .val และ textarea ใช้กล่อง/ฟอนต์/บรรทัดเดียวกันทุกประการ ให้สองฝั่งตรงกันเป๊ะ */
 .bl-cell .val, .bl-cell textarea {
   display: block; box-sizing: border-box; width: 100%; margin: 0; padding: 2px 3px;
-  font-family: "Courier New", Courier, monospace; font-size: 12px; font-weight: 700; line-height: 17px;
-  height: calc(var(--rows, 1) * 17px + 4px); white-space: pre-wrap; overflow: hidden; border: 1px solid transparent; border-radius: 2px;
+  font-family: "Courier New", Courier, monospace; font-size: 15px; font-weight: 700; line-height: 21px;
+  height: calc(var(--rows, 1) * 21px + 4px); white-space: pre-wrap; overflow: hidden; border: 1px solid transparent; border-radius: 2px;
   word-break: break-word;
 }
 .bl-cell .val { user-select: none; -webkit-user-select: none; }
-.bl-cell .val .ins { color: var(--danger); }
-.bl-cell.ok .val .ins { color: #047857; }
-.bl-cell.bad .val .ins { color: var(--danger); }
+.bl-cell .val .ins { color: var(--red-bright); }
+.bl-cell.ok .val .ins { color: var(--green); }
+.bl-cell.bad .val .ins { color: var(--red-bright); }
 .bl-counter { display: inline-block; margin-left: 10px; padding: 2px 10px; border-radius: 999px; background: #fee2e2; color: var(--danger); font-size: 14px; }
 .bl-counter.done { background: #d1fae5; color: #047857; }
 .bl.editable .bl-cell[data-key] { cursor: text; }
@@ -154,3 +157,27 @@ textarea { resize: vertical; }
 .stat .v { font-size: 22px; font-weight: 700; color: var(--navy-dark); }
 .status-ok { color: #047857; font-weight: 700; }
 .status-err { color: var(--danger); font-weight: 700; }
+
+/* Review (หน้าดูรายละเอียดหลังสอบ) */
+.review-nav { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.review-nav .btn { width: auto; margin: 0; padding: 10px 16px; font-size: 15px; }
+.review-nav .btn.active { background: var(--navy-dark); color: #fff; }
+.diff-block { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; font-size: 17px; line-height: 1.9; white-space: pre-wrap; word-break: break-word; margin-bottom: 14px; }
+.diff-block.mono { font-family: "Google Sans", Roboto, Arial, sans-serif; font-size: 15px; line-height: 1.6; }
+.diff-block .del { background: #fecaca; color: #991b1b; text-decoration: line-through; border-radius: 3px; }
+.diff-block .ins { background: #fee2e2; color: var(--red-bright); font-weight: 700; border-radius: 3px; }
+.diff-block .missing { background: #fef3c7; color: #92400e; border-radius: 3px; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 14px; color: var(--muted); margin-bottom: 10px; }
+.legend span i { display: inline-block; width: 14px; height: 14px; border-radius: 3px; vertical-align: -2px; margin-right: 5px; }
+.review-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; }
+.review-table th, .review-table td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.review-table th { color: var(--muted); font-size: 13px; font-weight: 600; }
+.ok { color: var(--green); font-weight: 700; } .bad { color: var(--red-bright); font-weight: 700; }
+.bl-cell.r-fixed .val { background: #d1fae5; color: #065f46; }
+.bl-cell.r-missed .val { background: #fee2e2; color: #991b1b; }
+.bl-cell.r-damaged .val { background: #ffedd5; color: #9a3412; }
+.q.review label { cursor: default; }
+.q.review label.correct { border-color: var(--green); background: #ecfdf5; }
+.q.review label.wrong { border-color: var(--red-bright); background: #fef2f2; }
+.q.review label.correct .letter { background: var(--green); color: #fff; }
+.q.review label.wrong .letter { background: var(--red-bright); color: #fff; }

@@ -16,6 +16,22 @@
     return prev[b.length];
   }
 
+  /* char-level diff → [{t:"eq"|"del"|"ins", c}] (del = อยู่ใน a แต่หายไป, ins = พิมพ์เพิ่ม/ผิดใน b) */
+  function diffOps(a, b) {
+    a = Array.from(a || ""); b = Array.from(b || "");
+    const n = a.length, m = b.length;
+    const dp = Array.from({ length: n + 1 }, () => new Uint16Array(m + 1));
+    for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--)
+      dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    const out = []; let i = 0, j = 0;
+    while (i < n || j < m) {
+      if (i < n && j < m && a[i] === b[j]) { out.push({ t: "eq", c: a[i] }); i++; j++; }
+      else if (j < m && (i >= n || dp[i][j + 1] >= dp[i + 1][j])) { out.push({ t: "ins", c: b[j] }); j++; }
+      else { out.push({ t: "del", c: a[i] }); i++; }
+    }
+    return out;
+  }
+
   function similarity(a, b) {
     const len = Math.max(Array.from(a).length, Array.from(b).length);
     if (!len) return 1;
@@ -107,7 +123,7 @@
     return { correct, total: questions.length, score: +(correct / questions.length).toFixed(4), detail };
   }
 
-  const api = { levenshtein, similarity, normalizeText, normalizeField, scorePart1, scorePart2, scorePart3, scorePart4 };
+  const api = { levenshtein, diffOps, similarity, normalizeText, normalizeField, scorePart1, scorePart2, scorePart3, scorePart4 };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.HR_SCORING = api;
 })(typeof window !== "undefined" ? window : globalThis);

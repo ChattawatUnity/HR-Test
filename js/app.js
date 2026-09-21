@@ -78,6 +78,7 @@
           <li>ทำเรียงตามลำดับ ไม่สามารถย้อนกลับไป part ก่อนหน้าได้</li>
           <li>แต่ละส่วนมีเวลาจำกัด ในแต่ละ part จะเริ่มจับเวลาเมื่อกด "เริ่ม"</li>
           <li>ห้ามคัดลอก-วางข้อความ หรือเปิดหน้าจออื่นระหว่างทำแบบทดสอบ ระบบจะบันทึกความพยายามฝ่าฝืนไว้</li>
+          <li>แนะนำให้ทำแบบทดสอบแบบเต็มหน้าจอ (ระบบจะขอเปิดเต็มจอให้เมื่อกดเริ่ม หรือกด F11 เอง)</li>
         </ul>
       </div>
       <div class="card">
@@ -100,6 +101,7 @@
       if (!/^\d{9,10}$/.test(phone)) { err.textContent = "กรุณากรอกเบอร์โทรศัพท์ 9-10 หลัก"; err.classList.remove("hidden"); return; }
       state.candidate = { name, phone };
       state.startedAt = new Date().toISOString();
+      try { const el = document.documentElement; if (el.requestFullscreen && !document.fullscreenElement) el.requestFullscreen().catch(() => {}); } catch (e) {}
       state.stage = "intro:part1";
       saveState(); render();
     });
@@ -176,10 +178,83 @@
           <button class="btn btn-secondary btn-inline" id="download-btn">ดาวน์โหลดไฟล์ผลสอบ</button>
           <span class="muted"> กรุณาส่งไฟล์นี้ให้เจ้าหน้าที่</span>
         </div>
-      </div>`;
+        <h3 style="margin-top:26px">ดูรายละเอียดคำตอบ</h3>
+        <div class="review-nav">
+          ${ORDER.map((p, i) => `<button class="btn btn-secondary" data-review="${p}">Part ${i + 1}: ${window.HR_PARTS[p].title}</button>`).join("")}
+        </div>
+      </div>
+      <div id="review"></div>`;
+    app.querySelectorAll("[data-review]").forEach(b => b.addEventListener("click", () => {
+      app.querySelectorAll("[data-review]").forEach(x => x.classList.toggle("active", x === b));
+      renderReview(b.dataset.review);
+      document.getElementById("review").scrollIntoView({ behavior: "smooth" });
+    }));
     const payload = buildPayload(pasteCount, tabCount);
     document.getElementById("download-btn").addEventListener("click", () => downloadJson(payload));
     submitResults(payload);
+  }
+
+  /* ---------- review ---------- */
+  function diffBlocks(reference, typed, mono) {
+    const ops = HR_SCORING.diffOps(reference, typed);
+    const ref = ops.filter(o => o.t !== "ins").map(o => o.t === "del" ? `<span class="missing">${escapeHtml(o.c)}</span>` : escapeHtml(o.c)).join("");
+    const typ = ops.filter(o => o.t !== "del").map(o => o.t === "ins" ? `<span class="ins">${escapeHtml(o.c)}</span>` : escapeHtml(o.c)).join("");
+    const cls = "diff-block" + (mono ? " mono" : "");
+    return `
+      <div class="legend"><span><i style="background:#fef3c7"></i>ในต้นฉบับแต่ไม่ได้พิมพ์ / พิมพ์ตกหล่น</span><span><i style="background:#fee2e2"></i>พิมพ์ผิดหรือพิมพ์เกิน</span></div>
+      <div class="muted">ต้นฉบับ</div><div class="${cls}">${ref || "<span class=muted>(ว่าง)</span>"}</div>
+      <div class="muted">ที่พิมพ์</div><div class="${cls}">${typ || "<span class=muted>(ไม่ได้พิมพ์)</span>"}</div>`;
+  }
+
+  function renderReview(partId) {
+    const box = document.getElementById("review");
+    const r = state.results[partId], a = state.answers[partId];
+    const idx = ORDER.indexOf(partId) + 1;
+    const pct = x => Math.round((x || 0) * 100) + "%";
+    let html = "";
+    if (partId === "part1") {
+      html = `<div class="summary-grid" style="margin-bottom:16px">
+          <div class="stat"><div class="k">ความเร็ว</div><div class="v">${r.wpm} WPM</div><div class="muted">สุทธิ ${r.netWpm} WPM</div></div>
+          <div class="stat"><div class="k">ความถูกต้อง</div><div class="v">${pct(r.accuracy)}</div><div class="muted">ผิด/ตกหล่น ${r.errors} ตัวอักษร</div></div>
+          <div class="stat"><div class="k">พิมพ์ได้</div><div class="v">${r.typedChars}/${r.referenceChars}</div><div class="muted">ตัวอักษร ใช้เวลา ${r.secondsUsed} วินาที</div></div>
+        </div>` + diffBlocks(cfg.PART1_TEXT.replace(/\s+/g, " ").trim(), (a.typed || "").replace(/\s+/g, " ").trim(), false);
+    } else if (partId === "part2") {
+      const row = (label, ok, typed, expect) => `<tr><td>${label}</td><td class="${ok ? "ok" : "bad"}">${ok ? "✓ ถูก" : "✗ ผิด"}</td><td>${escapeHtml(typed || "") || "<span class=muted>(ว่าง)</span>"}</td><td>${escapeHtml(expect)}</td></tr>`;
+      html = `<table class="review-table"><tr><th>รายการ</th><th>ผล</th><th>ที่พิมพ์</th><th>ที่ถูกต้อง</th></tr>
+          ${row("To", r.toOk, a.to, cfg.PART2.to)}
+          ${row("Cc", r.ccOk, a.cc, cfg.PART2.cc)}
+          ${a.bcc ? `<tr><td>Bcc</td><td class="bad">ไม่ควรมี</td><td>${escapeHtml(a.bcc)}</td><td>-</td></tr>` : ""}
+          ${a.subject ? `<tr><td>Subject</td><td class="muted">ไม่ตรวจ</td><td>${escapeHtml(a.subject)}</td><td>-</td></tr>` : ""}
+          ${row("เนื้อหา", r.bodyOk, r.bodyOk ? "ตรง 100%" : `ตรง ${pct(r.bodySimilarity)}`, "ตรงทุกตัวอักษร")}
+        </table>
+        <p class="muted">คะแนน ${r.points}/${r.maxPoints} = To 1 คะแนน + Cc 1 คะแนน + เนื้อหา 1 คะแนน</p>` +
+        diffBlocks(HR_SCORING.normalizeText(cfg.PART2.body), HR_SCORING.normalizeText(a.body), true);
+    } else if (partId === "part3") {
+      html = `<div class="legend"><span><i style="background:#d1fae5"></i>แก้ถูก ${r.fixed}</span><span><i style="background:#fee2e2"></i>ยังผิดอยู่ ${r.missed}</span><span><i style="background:#ffedd5"></i>ช่องที่ถูกอยู่แล้วแต่ถูกแก้จนผิด ${r.damaged}</span></div>
+        <div class="bl-compare">
+          <div><div class="bl-caption">ต้นฉบับ</div>${window.HR_RENDER_BL(cfg, cfg.BL_ORIGINAL, false)}</div>
+          <div><div class="bl-caption wrong">คำตอบของคุณ</div>${window.HR_RENDER_BL(cfg, a, false)}</div>
+        </div>`;
+    } else if (partId === "part4") {
+      html = `<p class="muted">ถูก ${r.correct}/${r.total} ข้อ</p>` + cfg.PART4.map((q, i) => `
+        <div class="q review">
+          <div class="qt"><span class="num">${i + 1}</span>${escapeHtml(q.q)} ${a[i] === q.answer ? '<span class="ok">✓</span>' : '<span class="bad">✗</span>'}</div>
+          <div class="choices">${q.choices.map((c, j) => {
+            const cls = j === q.answer ? "correct" : (j === a[i] ? "wrong" : "");
+            return `<label class="${cls}"><span class="letter">${"ABCD"[j]}</span><span>${escapeHtml(c)}${j === a[i] ? " (คุณเลือก)" : ""}${j === q.answer ? " (เฉลย)" : ""}</span></label>`;
+          }).join("")}</div>
+        </div>`).join("");
+    }
+    box.innerHTML = `<div class="card"><h2>Part ${idx}: ${window.HR_PARTS[partId].title}</h2>${html}</div>`;
+    if (partId === "part3") {
+      box.querySelectorAll(".bl-compare > div:last-child .bl-cell[data-key]").forEach(cell => {
+        const d = r.detail[cell.dataset.key];
+        if (d) cell.classList.add("r-" + d);
+      });
+      document.querySelector(".container").classList.add("wide");
+    } else {
+      document.querySelector(".container").classList.remove("wide");
+    }
   }
 
   function buildPayload(pasteCount, tabCount) {
