@@ -12,7 +12,9 @@ window.HR_PARTS.part3 = {
         <li>จะแสดงเอกสาร B/L สองฉบับ: <b>ด้านซ้ายคือต้นฉบับ</b> (อ่านอย่างเดียว) และ <b>ด้านขวาคือฉบับที่มีข้อผิดพลาด</b></li>
         <li>ตรวจสอบทุกช่องของฉบับด้านขวา <b>คลิกที่ช่อง</b> ที่ต้องการแก้ พิมพ์ให้ตรงกับต้นฉบับ แล้วคลิกที่อื่นเพื่อปิดช่องกรอก</li>
         <li>ฉบับด้านขวามีช่องที่ผิดอยู่ <b>${countWrong(cfg)} ช่อง</b> (บางช่องอาจผิดมากกว่า 1 จุด) ให้แก้เฉพาะช่องที่ผิดเท่านั้น</li>
-        <li>ตัวอักษรที่พิมพ์แก้ไขจะแสดงเป็น<span style="color:#b91c1c;font-weight:700">สีแดง</span> ถ้าแก้กลับเป็นค่าเดิมจะกลับเป็นสีดำ</li>
+        ${cfg.PART3_LIVE_FEEDBACK
+          ? `<li>ช่องที่แก้แล้วตรงกับต้นฉบับจะเป็น<span style="color:#047857;font-weight:700">สีเขียว</span> ถ้ายังไม่ตรงจะเป็น<span style="color:#b91c1c;font-weight:700">สีแดง</span> มีตัวนับบอกว่าแก้ถูกแล้วกี่ช่อง</li>`
+          : `<li>ตัวอักษรที่พิมพ์แก้ไขจะแสดงเป็น<span style="color:#b91c1c;font-weight:700">สีแดง</span> ถ้าแก้กลับเป็นค่าเดิมจะกลับเป็นสีดำ</li>`}
         <li>เวลา ${Math.round(cfg.TIME_LIMITS.part3 / 60)} นาที เริ่มจับเวลาเมื่อกด "เริ่ม"</li>
       </ul>`;
   },
@@ -23,10 +25,27 @@ window.HR_PARTS.part3 = {
     container.innerHTML = `
       <div class="bl-compare">
         <div><div class="bl-caption">ต้นฉบับ (ORIGINAL)</div>${renderBL(cfg, cfg.BL_ORIGINAL, false)}</div>
-        <div><div class="bl-caption wrong">ฉบับที่ต้องตรวจแก้ (คลิกช่องเพื่อแก้ไข — ผิด ${countWrong(cfg)} ช่อง)</div>${renderBL(cfg, answers, true)}</div>
+        <div><div class="bl-caption wrong">ฉบับที่ต้องตรวจแก้ (คลิกช่องเพื่อแก้ไข — ผิด ${countWrong(cfg)} ช่อง) <span class="bl-counter" id="p3-counter"></span></div>${renderBL(cfg, answers, true)}</div>
       </div>
       <div class="actions"><button class="btn btn-primary btn-inline" id="p3-submit">ส่ง</button></div>`;
     document.querySelector(".container").classList.add("wide");
+
+    const live = !!cfg.PART3_LIVE_FEEDBACK;
+    const total = countWrong(cfg);
+    const norm = HR_SCORING.normalizeField;
+    const counter = container.querySelector("#p3-counter");
+    const updateCounter = () => {
+      const keys = Object.keys(cfg.BL_ORIGINAL);
+      if (live) {
+        const ok = keys.filter(k => norm(initial[k]) !== norm(cfg.BL_ORIGINAL[k]) && norm(answers[k]) === norm(cfg.BL_ORIGINAL[k])).length;
+        counter.textContent = `ถูกแล้ว ${ok}/${total}`;
+        counter.classList.toggle("done", ok === total);
+      } else {
+        const touched = keys.filter(k => answers[k] !== initial[k]).length;
+        counter.textContent = `แก้ไปแล้ว ${touched}/${total} ช่อง`;
+      }
+    };
+    updateCounter();
 
     container.querySelectorAll(".bl.editable .bl-cell[data-key]").forEach(cell => {
       const key = cell.dataset.key;
@@ -41,8 +60,15 @@ window.HR_PARTS.part3 = {
       };
       const close = () => {
         answers[key] = ta.value;
-        val.innerHTML = diffHtml(initial[key], ta.value);
-        cell.classList.remove("editing");
+        cell.classList.remove("editing", "ok", "bad");
+        if (live) {
+          const touched = ta.value !== initial[key];
+          val.textContent = ta.value;
+          if (touched) cell.classList.add(norm(ta.value) === norm(cfg.BL_ORIGINAL[key]) ? "ok" : "bad");
+        } else {
+          val.innerHTML = diffHtml(initial[key], ta.value);
+        }
+        updateCounter();
       };
       cell.addEventListener("click", e => { if (e.target !== ta) open(); });
       ta.addEventListener("blur", close);
