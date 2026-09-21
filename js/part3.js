@@ -41,8 +41,7 @@ window.HR_PARTS.part3 = {
         counter.textContent = `ถูกแล้ว ${ok}/${total}`;
         counter.classList.toggle("done", ok === total);
       } else {
-        const touched = keys.filter(k => answers[k] !== initial[k]).length;
-        counter.textContent = `แก้ไปแล้ว ${touched}/${total} ช่อง`;
+        counter.textContent = "";
       }
     };
     updateCounter();
