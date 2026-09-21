@@ -13,7 +13,7 @@ window.HR_PARTS.part3 = {
         <li>ตรวจสอบทุกช่องของฉบับด้านขวา <b>คลิกที่ช่อง</b> ที่ต้องการแก้ พิมพ์ให้ตรงกับต้นฉบับ แล้วคลิกที่อื่นเพื่อปิดช่องกรอก</li>
         <li>ฉบับด้านขวามีช่องที่ผิดอยู่ <b>${countWrong(cfg)} ช่อง</b> (บางช่องอาจผิดมากกว่า 1 จุด) ให้แก้เฉพาะช่องที่ผิดเท่านั้น</li>
         ${cfg.PART3_LIVE_FEEDBACK
-          ? `<li>ช่องที่แก้แล้วตรงกับต้นฉบับจะเป็น<span style="color:#047857;font-weight:700">สีเขียว</span> ถ้ายังไม่ตรงจะเป็น<span style="color:#b91c1c;font-weight:700">สีแดง</span> มีตัวนับบอกว่าแก้ถูกแล้วกี่ช่อง</li>`
+          ? `<li>ตัวอักษรที่พิมพ์แก้ไขจะเป็น<span style="color:#b91c1c;font-weight:700">สีแดง</span> ถ้าช่องนั้นยังไม่ตรงต้นฉบับ และเป็น<span style="color:#047857;font-weight:700">สีเขียว</span> เมื่อช่องนั้นตรงแล้ว มีตัวนับบอกว่าแก้ถูกแล้วกี่ช่อง</li>`
           : `<li>ตัวอักษรที่พิมพ์แก้ไขจะแสดงเป็น<span style="color:#b91c1c;font-weight:700">สีแดง</span> ถ้าแก้กลับเป็นค่าเดิมจะกลับเป็นสีดำ</li>`}
         <li>เวลา ${Math.round(cfg.TIME_LIMITS.part3 / 60)} นาที เริ่มจับเวลาเมื่อกด "เริ่ม"</li>
       </ul>`;
@@ -61,12 +61,9 @@ window.HR_PARTS.part3 = {
       const close = () => {
         answers[key] = ta.value;
         cell.classList.remove("editing", "ok", "bad");
-        if (live) {
-          const touched = ta.value !== initial[key];
-          val.textContent = ta.value;
-          if (touched) cell.classList.add(norm(ta.value) === norm(cfg.BL_ORIGINAL[key]) ? "ok" : "bad");
-        } else {
-          val.innerHTML = diffHtml(initial[key], ta.value);
+        val.innerHTML = diffHtml(initial[key], ta.value);
+        if (live && ta.value !== initial[key]) {
+          cell.classList.add(norm(ta.value) === norm(cfg.BL_ORIGINAL[key]) ? "ok" : "bad");
         }
         updateCounter();
       };
