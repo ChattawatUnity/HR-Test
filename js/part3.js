@@ -143,24 +143,24 @@ function renderBL(cfg, doc, editable) {
         <div class="bl-title">
           <div class="t">BILL OF LADING</div>
           <div class="co">UNITY AGENCY COMPANY LIMITED</div>
-          <div class="addr">128/13 Soi Silom 6, Silom Road, Suriyawongse, Bangrak, Bangkok 10500<br>Tel: (662) 634-2020 (Auto 10 Lines) | Fax: (662) 634-2022-3</div>
+          <div class="addr">128/13 Soi Silom 6, Silom Road, Suriyawongse,<br>Bangrak, Bangkok 10500<br>Tel: (662) 634-2020</div>
         </div>
         ${cell("serviceRequired", "", 1)}
         ${cell("bkkDestination", "", 1)}
       </div>
     </div>
     <div class="bl-row4">
-      ${cell("feederVessel", "", 2, "PRE-CARRIAGE BY / FEEDER VESSEL")}
-      ${cell("placeOfAcceptance", "", 2, "PLACE OF RECEIPT / ACCEPTANCE")}
-      ${cell("motherVessel", "", 2, "OCEAN VESSEL / VOYAGE NO. (MOTHER VESSEL)")}
+      ${cell("feederVessel", "", 2)}
+      ${cell("placeOfAcceptance", "", 2)}
+      ${cell("motherVessel", "", 2)}
       ${cell("portOfLoading", "", 2)}
-      ${cell("portOfDischarge", "", 2)}
-      ${cell("placeOfDelivery", "", 2)}
-      ${cell("finalDestination", "", 2)}
-      ${cell("containerNo", "", 2, "CONTAINER NO. / SEAL NO.")}
+      ${cell("portOfDischarge", "", 1)}
+      ${cell("placeOfDelivery", "", 1)}
+      ${cell("finalDestination", "", 1)}
+      ${cell("containerNo", "", 1)}
     </div>
     <div class="bl-body-head">
-      <div>MARKS &amp; NUMBERS<br>CONTAINER NO. / SEAL NO.</div>
+      <div>MARKS &amp; NUMBERS<br>SEAL NO.</div>
       <div>NO. OF PKGS.<br>OR UNITS</div>
       <div>DESCRIPTION OF PACKAGES AND GOODS</div>
       <div>GROSS WEIGHT<br>MEASUREMENT</div>
