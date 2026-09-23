@@ -52,14 +52,18 @@
     sec = Math.max(0, Math.ceil(sec));
     return String(Math.floor(sec / 60)).padStart(2, "0") + ":" + String(sec % 60).padStart(2, "0");
   }
-  function startTimer(label, onExpire) {
+  function startTimer(label, onExpire, countUp) {
     stopTimer();
     timerLabel.textContent = label;
     timerEl.classList.remove("hidden", "warning");
     const tick = () => {
       const left = (state.deadline - Date.now()) / 1000;
-      timerVal.textContent = fmt(left);
-      if (left <= 30) timerEl.classList.add("warning");
+      if (countUp) {
+        timerVal.textContent = fmt((Date.now() - state.partStartedAt) / 1000);
+      } else {
+        timerVal.textContent = fmt(left);
+        if (left <= 30) timerEl.classList.add("warning");
+      }
       if (left <= 0) { stopTimer(); onExpire(); }
     };
     tick();
@@ -154,7 +158,8 @@
       if (ui.confirmText && !window.confirm(ui.confirmText)) return;
       finish(false);
     });
-    startTimer(`Part ${idx}`, () => { alert("หมดเวลา Part " + idx + " ระบบจะบันทึกคำตอบและไปส่วนถัดไป"); finish(true); });
+    const countUp = partId === "part1" && !!cfg.PART1_COUNT_UP;
+    startTimer(countUp ? "เวลาที่ใช้" : `Part ${idx}`, () => { alert("หมดเวลา Part " + idx + " ระบบจะบันทึกคำตอบและไปส่วนถัดไป"); finish(true); }, countUp);
   }
 
   function renderSummary() {
@@ -169,7 +174,7 @@
         <p>ขอบคุณคุณ <b>${escapeHtml(state.candidate.name)}</b> ที่ทำแบบทดสอบ ผลของคุณถูกบันทึกไว้แล้ว</p>
         <div class="summary-grid">
           <div class="stat"><div class="k">Part 1 พิมพ์ข้อความ</div><div class="v">${r.part1.wpm} WPM</div><div class="muted">ความถูกต้อง ${pct(r.part1.accuracy)}</div></div>
-          <div class="stat"><div class="k">Part 2 อีเมล</div><div class="v">${r.part2.points}/${r.part2.maxPoints}</div><div class="muted">เนื้อหาตรง ${pct(r.part2.bodySimilarity)}</div></div>
+          <div class="stat"><div class="k">Part 2 อีเมล</div><div class="v">${pct(r.part2.accuracy)}</div><div class="muted">ความถูกต้อง ผิด ${r.part2.errors} ตัวอักษร</div></div>
           <div class="stat"><div class="k">Part 3 ตรวจเอกสาร</div><div class="v">${r.part3.fixed}/${r.part3.total}</div><div class="muted">แก้ผิดเพิ่ม ${r.part3.damaged} ช่อง</div></div>
           <div class="stat"><div class="k">Part 4 คำศัพท์</div><div class="v">${r.part4.correct}/${r.part4.total}</div></div>
         </div>
@@ -219,15 +224,19 @@
           <div class="stat"><div class="k">พิมพ์ได้</div><div class="v">${r.typedChars}/${r.referenceChars}</div><div class="muted">ตัวอักษร ใช้เวลา ${r.secondsUsed} วินาที</div></div>
         </div>` + diffBlocks(cfg.PART1_TEXT.replace(/\s+/g, " ").trim(), (a.typed || "").replace(/\s+/g, " ").trim(), false);
     } else if (partId === "part2") {
-      const row = (label, ok, typed, expect) => `<tr><td>${label}</td><td class="${ok ? "ok" : "bad"}">${ok ? "✓ ถูก" : "✗ ผิด"}</td><td>${escapeHtml(typed || "") || "<span class=muted>(ว่าง)</span>"}</td><td>${escapeHtml(expect)}</td></tr>`;
-      html = `<table class="review-table"><tr><th>รายการ</th><th>ผล</th><th>ที่พิมพ์</th><th>ที่ถูกต้อง</th></tr>
-          ${row("To", r.toOk, a.to, cfg.PART2.to)}
-          ${row("Cc", r.ccOk, a.cc, cfg.PART2.cc)}
+      const d = r.detail || {};
+      const row = (label, det, typed, expect) => `<tr><td>${label}</td><td class="${det.ok ? "ok" : "bad"}">${det.ok ? "✓ ถูก" : `✗ ผิด ${det.errors} ตัว`}</td><td>${escapeHtml(typed || "") || "<span class=muted>(ว่าง)</span>"}</td><td>${escapeHtml(expect)}</td></tr>`;
+      html = `<div class="summary-grid" style="margin-bottom:16px">
+          <div class="stat"><div class="k">ความถูกต้องรวม</div><div class="v">${pct(r.accuracy)}</div><div class="muted">ผิด/ขาด ${r.errors} จาก ${r.referenceChars} ตัวอักษร</div></div>
+          <div class="stat"><div class="k">เนื้อหา</div><div class="v">${pct(r.bodySimilarity)}</div><div class="muted">ใช้เวลา ${r.secondsUsed} วินาที</div></div>
+        </div>
+        <table class="review-table"><tr><th>รายการ</th><th>ผล</th><th>ที่พิมพ์</th><th>ที่ถูกต้อง</th></tr>
+          ${row("To", d.to || {}, a.to, cfg.PART2.to)}
+          ${row("Cc", d.cc || {}, a.cc, cfg.PART2.cc)}
           ${a.bcc ? `<tr><td>Bcc</td><td class="bad">ไม่ควรมี</td><td>${escapeHtml(a.bcc)}</td><td>-</td></tr>` : ""}
           ${a.subject ? `<tr><td>Subject</td><td class="muted">ไม่ตรวจ</td><td>${escapeHtml(a.subject)}</td><td>-</td></tr>` : ""}
-          ${row("เนื้อหา", r.bodyOk, r.bodyOk ? "ตรง 100%" : `ตรง ${pct(r.bodySimilarity)}`, "ตรงทุกตัวอักษร")}
-        </table>
-        <p class="muted">คะแนน ${r.points}/${r.maxPoints} = To 1 คะแนน + Cc 1 คะแนน + เนื้อหา 1 คะแนน</p>` +
+          ${row("เนื้อหา", d.body || {}, r.bodyOk ? "ตรง 100%" : `ตรง ${pct(r.bodySimilarity)}`, "ตรงทุกตัวอักษร")}
+        </table>` +
         diffBlocks(HR_SCORING.normalizeText(cfg.PART2.body), HR_SCORING.normalizeText(a.body), true);
     } else if (partId === "part3") {
       html = `<div class="legend"><span><i style="background:#d1fae5"></i>แก้ถูก ${r.fixed}</span><span><i style="background:#fee2e2"></i>ยังผิดอยู่ ${r.missed}</span><span><i style="background:#ffedd5"></i>ช่องที่ถูกอยู่แล้วแต่ถูกแก้จนผิด ${r.damaged}</span></div>
@@ -236,12 +245,12 @@
           <div><div class="bl-caption wrong">คำตอบของคุณ</div>${window.HR_RENDER_BL(cfg, a, false)}</div>
         </div>`;
     } else if (partId === "part4") {
-      html = `<p class="muted">ถูก ${r.correct}/${r.total} ข้อ</p>` + cfg.PART4.map((q, i) => `
+      html = `<div class="legend"><span><i style="background:#ecfdf5;border:2px solid #059669"></i>เฉลย</span><span><i style="background:#fef2f2;border:2px solid #ff1a1a"></i>ข้อที่เลือกผิด</span><span>ถูก ${r.correct}/${r.total} ข้อ</span></div>` + cfg.PART4.map((q, i) => `
         <div class="q review">
           <div class="qt"><span class="num">${i + 1}</span>${escapeHtml(q.q)} ${a[i] === q.answer ? '<span class="ok">✓</span>' : '<span class="bad">✗</span>'}</div>
           <div class="choices">${q.choices.map((c, j) => {
             const cls = j === q.answer ? "correct" : (j === a[i] ? "wrong" : "");
-            return `<label class="${cls}"><span class="letter">${"ABCD"[j]}</span><span>${escapeHtml(c)}${j === a[i] ? " (คุณเลือก)" : ""}${j === q.answer ? " (เฉลย)" : ""}</span></label>`;
+            return `<label class="${cls}"><span class="letter">${"ABCD"[j]}</span><span>${escapeHtml(c)}</span></label>`;
           }).join("")}</div>
         </div>`).join("");
     }
@@ -264,7 +273,7 @@
       name: state.candidate.name,
       phone: state.candidate.phone,
       p1_wpm: r.part1.wpm, p1_netWpm: r.part1.netWpm, p1_accuracy: r.part1.accuracy, p1_completion: r.part1.completion, p1_timeUsed: r.part1.secondsUsed,
-      p2_to_ok: r.part2.toOk, p2_cc_ok: r.part2.ccOk, p2_body_ok: r.part2.bodyOk, p2_body_similarity: r.part2.bodySimilarity, p2_timeUsed: r.part2.secondsUsed,
+      p2_accuracy: r.part2.accuracy, p2_errors: r.part2.errors, p2_to_ok: r.part2.toOk, p2_cc_ok: r.part2.ccOk, p2_body_ok: r.part2.bodyOk, p2_body_similarity: r.part2.bodySimilarity, p2_timeUsed: r.part2.secondsUsed,
       p3_fixed: r.part3.fixed, p3_missed: r.part3.missed, p3_damaged: r.part3.damaged, p3_total: r.part3.total, p3_score: r.part3.score, p3_timeUsed: r.part3.secondsUsed,
       p4_correct: r.part4.correct, p4_total: r.part4.total, p4_score: r.part4.score, p4_timeUsed: r.part4.secondsUsed,
       violations_paste: pasteCount, violations_tabSwitch: tabCount,

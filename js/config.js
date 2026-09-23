@@ -93,7 +93,7 @@ window.HR_CONFIG = {
     marks:            "TC IN SQUARE\nHAN-04/2003S",
     packages:         "CARTONS 1,000",
     description:      "FROZEN CHICKEN (GALLUS DOMESTICUS)\n(ONE THOUSAND CARTONS ONLY)\nSTOWED IN REFRIGERATED CONTAINER AT\n-18 DEGREE CELCIUS\nFREIGHT PREPAID\nB/L ON BOARD 16/2/2026",
-    grossWeight:      "G.W. 12.500 M/TONS\nN.W. 12.000 M/TONS",
+    grossWeight:      "G.W. 12,500 M/TONS\nN.W. 12,000 M/TONS",
     totalInWords:     "ONE THOUSAND CARTONS ONLY",
     freightPayable:   "PREPAID",
     noOfOriginal:     "3 (THREE)",
@@ -101,6 +101,10 @@ window.HR_CONFIG = {
     remarks:          "Loading On Board Date: 16/02/2026",
     signature:        "UNITY AGENCY CO., LTD.",
   },
+
+  /* Part 1: true = จับเวลาเดินหน้า (แสดงเวลาที่ใช้ไป), false = นับถอยหลัง
+     TIME_LIMITS.part1 ยังเป็นเพดานสูงสุด ถึงแล้วระบบส่งให้อัตโนมัติ */
+  PART1_COUNT_UP: true,
 
   /* Part 3: แสดงผลถูก/ผิดทันทีระหว่างทำหรือไม่
      true  = ช่องที่แก้แล้วตรงต้นฉบับขึ้นสีเขียว ยังไม่ตรงขึ้นสีแดง และนับ "ถูกแล้ว x/7"
@@ -116,8 +120,12 @@ window.HR_CONFIG = {
     portOfLoading:    "BANGKOK, THALIAND",
     marks:            "TC IN SQUARE\nHAN-04/20038",
     description:      "FROZEN CHICKEN (GALLUS DOMESTICUS)\n(ONE THOUSAND CARTONS ONLY)\nSTOWED IN REFRIGERATED CONTAINER AT\n-18 DEGREE CELCIUS\nFREIGHT PREPAID\nB/L ON BOARD 16/2/2562",
+    grossWeight:      "G.W. 12.500 M/TONS\nN.W. 12.000 M/TONS",
     placeOfIssue:     "BANGK0K, THAILAND",
   },
+
+  /* จำนวน "จุด" ที่ผิด ที่จะบอกผู้สมัครในโจทย์ (นับด้วยตาให้ตรงกับ BL_WRONG) */
+  PART3_ERROR_POINTS: 8,
 
   /* ---------------- Part 4 : ศัพท์ shipping ---------------- */
   /* answer = index ของตัวเลือกที่ถูก (เริ่มที่ 0) */

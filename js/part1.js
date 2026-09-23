@@ -6,18 +6,27 @@ window.HR_PARTS.part1 = {
   intro(cfg) {
     return `
       <ul>
-        <li>พิมพ์ข้อความที่แสดง (ไทยปนอังกฤษ) ให้เหมือนต้นฉบับมากที่สุดและเร็วที่สุด</li>
-        <li>ระบบจะไม่แจ้งว่าพิมพ์ผิดหรือถูกระหว่างทำ จะตรวจความถูกต้องและความเร็วครั้งเดียวเมื่อกด "ส่ง" หรือหมดเวลา</li>
-        <li>เวลา ${Math.round(cfg.TIME_LIMITS.part1 / 60)} นาที เริ่มจับเวลาเมื่อกด "เริ่ม"</li>
+        <li>พิมพ์ข้อความที่แสดง (ไทยผสมอังกฤษ) ให้เหมือนต้นฉบับ วัดความเร็วและความถูกต้อง</li>
+        <li>ไม่ต้องกด Enter เพื่อขึ้นบรรทัดใหม่ ให้พิมพ์เรียงต่อกัน ระบบจะขึ้นบรรทัดใหม่ให้เองตรงกับต้นฉบับ</li>
+        <li>ระบบจะไม่แจ้งว่าพิมพ์ผิดหรือถูกระหว่างทำ จะตรวจความถูกต้องและความเร็วครั้งเดียวเมื่อกด "ส่ง"</li>
+        <li>เริ่มจับเวลาเมื่อกด "เริ่ม"</li>
       </ul>`;
   },
   render(cfg, container) {
     container.innerHTML = `
+      <div class="muted" style="margin-bottom:4px">ต้นฉบับ</div>
       <div class="reference-text" id="p1-ref"></div>
-      <textarea id="p1-input" placeholder="พิมพ์ข้อความข้างต้นที่นี่..." spellcheck="false" autocomplete="off"></textarea>
+      <div class="muted" style="margin:14px 0 4px">พิมพ์ที่นี่</div>
+      <textarea id="p1-input" class="reference-text" placeholder="พิมพ์ข้อความข้างต้นที่นี่..." spellcheck="false" autocomplete="off"></textarea>
       <div class="actions"><button class="btn btn-primary btn-inline" id="p1-submit">ส่ง</button></div>`;
     container.querySelector("#p1-ref").textContent = cfg.PART1_TEXT;
     const ta = container.querySelector("#p1-input");
+    /* กล่องพิมพ์สูงเท่าต้นฉบับ และกัน Enter ให้พิมพ์ต่อกันไปเลย */
+    const ref = container.querySelector("#p1-ref");
+    const sync = () => { ta.style.height = Math.max(ref.offsetHeight, ta.scrollHeight) + "px"; };
+    sync(); window.addEventListener("resize", sync);
+    ta.addEventListener("input", sync);
+    ta.addEventListener("keydown", e => { if (e.key === "Enter") e.preventDefault(); });
     ta.focus();
     return { submitBtn: container.querySelector("#p1-submit") };
   },

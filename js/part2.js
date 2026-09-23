@@ -6,7 +6,12 @@ window.HR_PARTS.part2 = {
   intro(cfg) {
     const full = cfg.PART2.body;
     return `
-      <p>พิมพ์ข้อความด้านล่างนี้ลงในเนื้อหาอีเมลให้หน้าตาเหมือนกัน <b>100%</b> (ไม่ต้องใส่ Subject) และส่งไปที่เมล <b>${cfg.PART2.to}</b> พร้อม CC ไปที่ <b>${cfg.PART2.cc}</b></p>
+      <ul style="margin:0 0 12px;padding-left:22px">
+        <li>ส่วนนี้วัด<b>ความถูกต้องแม่นยำและความละเอียด</b>ภายใต้เวลาที่นับถอยหลัง</li>
+        <li>พิมพ์ข้อความด้านล่างลงใน<b>เนื้อหาอีเมล</b>ให้เหมือนกันทุกตัวอักษร ทุกบรรทัด ทุกช่องว่าง (ไม่ต้องใส่ Subject)</li>
+        <li>ส่งไปที่ <b>${cfg.PART2.to}</b> และ CC ไปที่ <b>${cfg.PART2.cc}</b></li>
+        <li>คะแนนคิดจากเปอร์เซ็นต์ตัวอักษรที่ถูกต้องของ To, CC และเนื้อหารวมกัน ทุกตัวที่ผิดหรือขาดจะถูกหัก</li>
+      </ul>
       <div class="email-target">${escapeHtml(full)}</div>
       <p class="muted" style="margin:10px 0 0">เวลา ${Math.round(cfg.TIME_LIMITS.part2 / 60)} นาที เริ่มจับเวลาเมื่อกด "เริ่ม" — กดปุ่ม Send ในหน้าจอเพื่อส่งคำตอบ</p>`;
   },

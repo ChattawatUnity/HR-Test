@@ -85,16 +85,28 @@
     };
   }
 
-  /* Part 2 — ตรวจ To, Cc และเนื้อหา (ไม่ตรวจ Subject) */
+  /* Part 2 — ความถูกต้องรวม (To + Cc + เนื้อหา) นับเป็นเปอร์เซ็นต์ตัวอักษรที่ตรง */
   function scorePart2(answer, expected) {
-    const eq = (a, b) => String(a || "").trim().toLowerCase() === String(b || "").trim().toLowerCase();
+    const lc = x => String(x || "").trim().toLowerCase();
     const bodyA = normalizeText(answer.body), bodyE = normalizeText(expected.body);
-    const toOk = eq(answer.to, expected.to);
-    const ccOk = eq(answer.cc, expected.cc);
-    const bodyOk = bodyA === bodyE;
-    const bodySimilarity = +similarity(bodyA, bodyE).toFixed(4);
-    const points = (toOk ? 1 : 0) + (ccOk ? 1 : 0) + (bodyOk ? 1 : 0);
-    return { toOk, ccOk, ccOpened: !!answer.ccOpened, bodyOk, bodySimilarity, points, maxPoints: 3, score: +(points / 3).toFixed(4) };
+    const parts = [
+      { key: "to",   a: lc(answer.to), e: lc(expected.to) },
+      { key: "cc",   a: lc(answer.cc), e: lc(expected.cc) },
+      { key: "body", a: bodyA, e: bodyE },
+    ];
+    let errors = 0, refLen = 0;
+    const detail = {};
+    for (const p of parts) {
+      const d = levenshtein(p.a, p.e), len = Array.from(p.e).length;
+      errors += d; refLen += len;
+      detail[p.key] = { ok: d === 0, errors: d, similarity: +Math.max(0, 1 - d / Math.max(len, 1)).toFixed(4) };
+    }
+    const accuracy = +Math.max(0, 1 - errors / Math.max(refLen, 1)).toFixed(4);
+    return {
+      toOk: detail.to.ok, ccOk: detail.cc.ok, bodyOk: detail.body.ok, ccOpened: !!answer.ccOpened,
+      bodySimilarity: detail.body.similarity, errors, referenceChars: refLen,
+      accuracy, score: accuracy, detail,
+    };
   }
 
   /* Part 3 */

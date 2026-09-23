@@ -11,7 +11,7 @@ window.HR_PARTS.part3 = {
       <ul>
         <li>จะแสดงเอกสาร B/L สองฉบับ: <b>ด้านซ้ายคือต้นฉบับ</b> (อ่านอย่างเดียว) และ <b>ด้านขวาคือฉบับที่มีข้อผิดพลาด</b></li>
         <li>ตรวจสอบทุกช่องของฉบับด้านขวา <b>คลิกตรงตำแหน่งที่ต้องการแก้</b> พิมพ์ให้ตรงกับต้นฉบับ แล้วกด <b>Enter</b> หรือคลิกที่อื่นเพื่อปิดช่องกรอก (Shift+Enter = ขึ้นบรรทัดใหม่)</li>
-        <li>ฉบับด้านขวามีช่องที่ผิดอยู่ <b>${countWrong(cfg)} ช่อง</b> (บางช่องอาจผิดมากกว่า 1 จุด) ให้แก้เฉพาะช่องที่ผิดเท่านั้น</li>
+        <li>ฉบับด้านขวามีช่องที่ผิดอยู่ <b>${errorPoints(cfg)} จุด</b> ให้แก้เฉพาะจุดที่ผิดเท่านั้น</li>
         ${cfg.PART3_LIVE_FEEDBACK
           ? `<li>ตัวอักษรที่พิมพ์แก้ไขจะเป็น<span style="color:#b91c1c;font-weight:700">สีแดง</span> ถ้าช่องนั้นยังไม่ตรงต้นฉบับ และเป็น<span style="color:#047857;font-weight:700">สีเขียว</span> เมื่อช่องนั้นตรงแล้ว มีตัวนับบอกว่าแก้ถูกแล้วกี่ช่อง</li>`
           : `<li>ตัวอักษรที่พิมพ์แก้ไขจะแสดงเป็น<span style="color:#b91c1c;font-weight:700">สีแดง</span> ถ้าแก้กลับเป็นค่าเดิมจะกลับเป็นสีดำ</li>`}
@@ -25,7 +25,7 @@ window.HR_PARTS.part3 = {
     container.innerHTML = `
       <div class="bl-compare">
         <div><div class="bl-caption">ต้นฉบับ (ORIGINAL)</div>${renderBL(cfg, cfg.BL_ORIGINAL, false)}</div>
-        <div><div class="bl-caption wrong">ฉบับที่ต้องตรวจแก้ (คลิกช่องเพื่อแก้ไข — ผิด ${countWrong(cfg)} ช่อง) <span class="bl-counter" id="p3-counter"></span></div>${renderBL(cfg, answers, true)}</div>
+        <div><div class="bl-caption wrong">ฉบับที่ต้องตรวจแก้ (คลิกช่องเพื่อแก้ไข — ผิด ${errorPoints(cfg)} จุด) <span class="bl-counter" id="p3-counter"></span></div>${renderBL(cfg, answers, true)}</div>
       </div>
       <div class="actions"><button class="btn btn-primary btn-inline" id="p3-submit">ส่ง</button></div>`;
     document.querySelector(".container").classList.add("wide");
@@ -88,6 +88,8 @@ window.HR_PARTS.part3 = {
   },
 };
 
+function errorPoints(cfg) { return cfg.PART3_ERROR_POINTS || countWrong(cfg); }
+
 function countWrong(cfg) {
   return Object.keys(cfg.BL_WRONG).filter(k => HR_SCORING.normalizeField(cfg.BL_WRONG[k]) !== HR_SCORING.normalizeField(cfg.BL_ORIGINAL[k])).length;
 }
@@ -138,21 +140,24 @@ function renderBL(cfg, doc, editable) {
       </div>
       <div class="bl-right">
         ${cell("blNo", "bl-no", 1)}
-        <div class="bl-title">BILL OF LADING</div>
+        <div class="bl-title">
+          <div class="t">BILL OF LADING</div>
+          <div class="co">UNITY AGENCY COMPANY LIMITED</div>
+          <div class="addr">128/13 Soi Silom 6, Silom Road, Suriyawongse, Bangrak, Bangkok 10500<br>Tel: (662) 634-2020 (Auto 10 Lines) | Fax: (662) 634-2022-3</div>
+        </div>
         ${cell("serviceRequired", "", 1)}
         ${cell("bkkDestination", "", 1)}
-        <div class="bl-cell bl-fill"></div>
       </div>
     </div>
     <div class="bl-row4">
-      ${cell("feederVessel", "", 1, "PRE-CARRIAGE BY / FEEDER VESSEL")}
-      ${cell("placeOfAcceptance", "", 1, "PLACE OF RECEIPT / ACCEPTANCE")}
-      ${cell("motherVessel", "", 1, "OCEAN VESSEL / VOYAGE NO. (MOTHER VESSEL)")}
-      ${cell("portOfLoading", "", 1)}
-      ${cell("portOfDischarge", "", 1)}
-      ${cell("placeOfDelivery", "", 1)}
-      ${cell("finalDestination", "", 1)}
-      ${cell("containerNo", "", 1, "CONTAINER NO. / SEAL NO.")}
+      ${cell("feederVessel", "", 2, "PRE-CARRIAGE BY / FEEDER VESSEL")}
+      ${cell("placeOfAcceptance", "", 2, "PLACE OF RECEIPT / ACCEPTANCE")}
+      ${cell("motherVessel", "", 2, "OCEAN VESSEL / VOYAGE NO. (MOTHER VESSEL)")}
+      ${cell("portOfLoading", "", 2)}
+      ${cell("portOfDischarge", "", 2)}
+      ${cell("placeOfDelivery", "", 2)}
+      ${cell("finalDestination", "", 2)}
+      ${cell("containerNo", "", 2, "CONTAINER NO. / SEAL NO.")}
     </div>
     <div class="bl-body-head">
       <div>MARKS &amp; NUMBERS<br>CONTAINER NO. / SEAL NO.</div>
