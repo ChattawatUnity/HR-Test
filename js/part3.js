@@ -27,8 +27,8 @@ window.HR_PARTS.part3 = {
         <div><div class="bl-caption">ต้นฉบับ (ORIGINAL)</div>${renderBL(cfg, cfg.BL_ORIGINAL, false)}</div>
         <div><div class="bl-caption wrong">ฉบับที่ต้องตรวจแก้ (คลิกช่องเพื่อแก้ไข — ผิด ${errorPoints(cfg)} จุด) <span class="bl-counter" id="p3-counter"></span></div>${renderBL(cfg, answers, true)}</div>
       </div>
-      <div class="actions"><button class="btn btn-primary btn-inline" id="p3-submit">ส่ง</button></div>`;
-    document.querySelector(".container").classList.add("wide");
+      <div class="actions p3-actions"><button class="btn btn-primary btn-inline" id="p3-submit">ส่ง</button></div>`;
+    document.querySelector(".container").classList.add("wide", "p3");
 
     const live = !!cfg.PART3_LIVE_FEEDBACK;
     const total = countWrong(cfg);
@@ -80,7 +80,7 @@ window.HR_PARTS.part3 = {
   collect(cfg, container) {
     const active = container.querySelector(".bl-cell.editing textarea");
     if (active) active.blur();
-    document.querySelector(".container").classList.remove("wide");
+    document.querySelector(".container").classList.remove("wide", "p3");
     return Object.assign({}, this._answers);
   },
   score(cfg, answer) {
@@ -168,7 +168,7 @@ function renderBL(cfg, doc, editable) {
     <div class="bl-body">
       <div class="bl-body-col">${cell("marks", "nolbl", 3)}${cell("sealNo", "nolbl", 1, "SEAL NO.")}</div>
       <div class="bl-body-col">${cell("packages", "nolbl", 2)}</div>
-      <div class="bl-body-col">${cell("description", "nolbl", 9)}</div>
+      <div class="bl-body-col">${cell("description", "nolbl", 8)}</div>
       <div class="bl-body-col">${cell("grossWeight", "nolbl", 4)}</div>
     </div>
     <div class="bl-row3">
