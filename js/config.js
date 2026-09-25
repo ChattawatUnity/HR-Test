@@ -113,7 +113,7 @@ window.HR_CONFIG = {
   /* ช่องที่ทำให้ผิดในฉบับที่ผู้สมัครต้องแก้ (key ต้องตรงกับ BL_ORIGINAL)
      จำนวนช่องที่ผิดจะถูกแสดงในโจทย์อัตโนมัติ */
   BL_WRONG: {
-    shipper:          "SARA FARMS CO., LTD.\n44/4 MOO 11, NAWAMIN ROAD, KANNAYAW,\nKANNAYAW DISTRICT, BANGKOK 10230, THAILAND.",
+    shipper:          "SARA FARMS CO., LTD.\n44/4 MOO 11, NAWAMIN ROAD, KANNAYAW,\nKANNAYAW DISTRICT, BANGKOK 10320, THAILAND.",
     blNo:             "BKK236532",
     serviceRequired:  "CY/CFS",
     portOfLoading:    "BANGKOK, THALIAND",
