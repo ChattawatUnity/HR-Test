@@ -9,7 +9,7 @@ window.HR_CONFIG = {
 
   /* เวลาจำกัดแต่ละ part (วินาที) */
   TIME_LIMITS: {
-    part1: 5 * 60,
+    part1: 10 * 60,
     part2: 10 * 60,
     part3: 10 * 60,
     part4: 5 * 60,
@@ -17,10 +17,9 @@ window.HR_CONFIG = {
 
   /* ---------------- Part 1 : พิมพ์ภาษาไทย ---------------- */
   PART1_TEXT:
-"เรียนคุณลูกค้า ทางบริษัทขอแจ้ง Draft B/L No. BKK235632 สำหรับ Shipper SAHA FARMS CO., LTD. " +
-"สินค้า FROZEN CHICKEN จำนวน 1,000 CARTONS บรรจุในตู้ TRLU1052114 Seal No. SPIC172554 " +
-"โหลดขึ้นเรือ SATSUKI V.096N จาก Port of Loading BANGKOK ไปยัง Port of Discharge OSAKA, JAPAN " +
-"กำหนด ETD วันที่ 16/02/2026 และ ETA ประมาณวันที่ 25/02/2026 กรุณาตรวจสอบรายละเอียดและแจ้งกลับภายในวันนี้ก่อน 17.00 น. ขอบคุณครับ",
+"เรียนคุณลูกค้า ทางบริษัทขอแจ้งข้อมูลสำหรับ SAHA FARMS CO., LTD. " +
+"โหลดขึ้นเรือ SATSUKI V.096N จาก BANGKOK ไปยัง OSAKA, JAPAN " +
+"กรุณาตรวจสอบรายละเอียดและแจ้งกลับภายในวันที่ 12/05/2025 ก่อน 17.00 น.",
 
   /* ---------------- Part 2 : อีเมลภาษาอังกฤษ ---------------- */
   PART2: {
@@ -83,7 +82,7 @@ window.HR_CONFIG = {
     feederVessel:     "SATSUKI V.096N",
     motherVessel:     "",
     portOfLoading:    "BANGKOK, THAILAND",
-    placeOfAcceptance:"BANGKOK, THAILAND",
+    placeOfAcceptance:"LAEM CHABANG, THAILAND",
     portOfDischarge:  "OSAKA, JAPAN",
     placeOfDelivery:  "OSAKA, JAPAN",
     finalDestination: "OSAKA, JAPAN",
@@ -114,14 +113,14 @@ window.HR_CONFIG = {
   /* ช่องที่ทำให้ผิดในฉบับที่ผู้สมัครต้องแก้ (key ต้องตรงกับ BL_ORIGINAL)
      จำนวนช่องที่ผิดจะถูกแสดงในโจทย์อัตโนมัติ */
   BL_WRONG: {
-    shipper:          "SARA FARMS CO., LTD.\n44/4 MOO 11, NAWAMIN ROAD, KANNAYAW,\nKANNAYAW DISTRICT, BANGKOK 10320, THAILAND.",
+    shipper:          "SARA FARMS CO., LTD.\n44/4 MOO 11, NAWAMIN ROAD, KANNAYAW,\nKANNAYAW DISTRICT, BANGKOK 10230, THAILAND.",
     blNo:             "BKK236532",
     serviceRequired:  "CY/CFS",
     portOfLoading:    "BANGKOK, THALIAND",
+    placeOfAcceptance:"LEAM CHABANG, THAILAND",
     marks:            "TC IN SQUARE\nHAN-04/20038",
     description:      "FROZEN CHICKEN (GALLUS DOMESTICUS)\n(ONE THOUSAND CARTONS ONLY)\nSTOWED IN REFRIGERATED CONTAINER AT\n-18 DEGREE CELCIUS\nFREIGHT PREPAID\nB/L ON BOARD 16/2/2562",
     grossWeight:      "G.W. 12.500 M/TONS\nN.W. 12.000 M/TONS",
-    placeOfIssue:     "BANGK0K, THAILAND",
   },
 
   /* จำนวน "จุด" ที่ผิด ที่จะบอกผู้สมัครในโจทย์ (นับด้วยตาให้ตรงกับ BL_WRONG) */
@@ -134,11 +133,11 @@ window.HR_CONFIG = {
     { q: "Temperature",       choices: ["ทะเล", "อากาศ", "อุณหภูมิ", "ความชื้น"], answer: 2 },
     { q: "Port of Discharge", choices: ["เส้นทางเดินเรือ", "ท่าเรือต้นทาง", "ท่าเรือปลายทาง", "ท่าเรือผ่านทาง"], answer: 2 },
     { q: "Delay",             choices: ["ก่อนกำหนด", "ล่าช้า", "ผิดสถานที่", "เปลี่ยนสถานที่"], answer: 1 },
-    { q: "Estimated Time of Departure (ETD)", choices: ["วันที่เรือถึงที่หมาย", "วันที่เรือออก", "ระยะเวลาขนส่งทั้งหมด", "ระยะเวลาที่สินค้าอยู่บนเรือ"], answer: 1 },
+    { q: "Estimated Time of Departure (ETD)", choices: ["เวลาคาดการณ์ที่เรือถึงปลายทาง", "เวลาคาดการณ์ที่เรือจะออก", "ระยะเวลาขนส่งทั้งหมดโดยประมาณ", "ระยะเวลาโดยประมาณที่สินค้าอยู่บนเรือ"], answer: 1 },
     { q: "Goods",             choices: ["ดี", "พอใช้", "สินค้า", "บริการ"], answer: 2 },
     { q: "Container Yard (CY)", choices: ["ลานพักตู้สินค้า", "โกดังรวมสินค้า", "ปีปฏิทิน", "ท่าเรือปลายทาง"], answer: 0 },
     { q: "Expense",           choices: ["รายได้", "ค่าใช้จ่าย", "ค่าประกันภัย", "ใบรับรอง"], answer: 1 },
     { q: "Certificate",       choices: ["ใบรับรอง", "ค่าประกันภัย", "รายได้", "ค่าใช้จ่าย"], answer: 0 },
-    { q: "Mother Vessel",     choices: ["บริษัทแม่", "เรือแม่", "นักธุรกิจสาว", "ภาษาที่ใช้ในเอกสาร"], answer: 1 },
+    { q: "Mother Vessel",     choices: ["บริษัทแม่", "เรือแม่", "พนักงานเพศหญิง", "ภาษาที่ใช้ในเอกสาร"], answer: 1 },
   ],
 };
