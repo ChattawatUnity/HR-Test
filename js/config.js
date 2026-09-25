@@ -9,7 +9,7 @@ window.HR_CONFIG = {
 
   /* เวลาจำกัดแต่ละ part (วินาที) */
   TIME_LIMITS: {
-    part1: 10 * 60,
+    part1: 5 * 60,
     part2: 10 * 60,
     part3: 10 * 60,
     part4: 5 * 60,
