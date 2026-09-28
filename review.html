@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>ดูผลแบบทดสอบ (HR)</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner"><h1>ดูผลแบบทดสอบผู้สมัคร (สำหรับ HR)</h1></div>
+  </header>
+
+  <main class="container" id="app">
+    <div class="card" id="input-card">
+      <h2>วางผลสอบจาก Google Sheet</h2>
+      <ol class="muted" style="margin:0 0 12px;padding-left:20px;font-size:15px">
+        <li>เปิดชีต Results แล้วคลิกเลขแถวของผู้สมัครทางซ้ายสุด เพื่อเลือกทั้งแถว (หรือคลิกเฉพาะเซลล์ raw_json ก็ได้)</li>
+        <li>กด Ctrl+C แล้วกลับมาวางในช่องด้านล่างด้วย Ctrl+V</li>
+        <li>กด "แสดงผล" ข้อมูลจะแสดงบนเครื่องนี้เท่านั้น ไม่ถูกส่งไปที่ไหน</li>
+      </ol>
+      <textarea id="raw-input" rows="6" spellcheck="false" placeholder='วางทั้งแถว หรือเฉพาะเซลล์ raw_json ที่ขึ้นต้นด้วย {"startedAt": ...'></textarea>
+      <div class="error hidden" id="raw-error"></div>
+      <button class="btn btn-primary" id="show-btn">แสดงผล</button>
+    </div>
+    <div id="result"></div>
+    <div id="review"></div>
+  </main>
+
+  <script src="js/config.js"></script>
+  <script src="js/scoring.js"></script>
+  <script src="js/part1.js"></script>
+  <script src="js/part2.js"></script>
+  <script src="js/part3.js"></script>
+  <script src="js/part4.js"></script>
+  <script src="js/review.js"></script>
+  <script>
+  (function () {
+    const cfg = window.HR_CONFIG;
+    const esc = s => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+    /* รับได้ทั้ง "ทั้งแถว" (คั่นด้วย tab) และ "เฉพาะเซลล์ raw_json" รวมถึงกรณีที่ Sheets ครอบด้วย " และใส่ "" แทน " */
+    function parseInput(text) {
+      text = text.trim();
+      let name = "", phone = "", ts = "";
+      const cells = text.split("\t");
+      if (cells.length > 3) { ts = cells[0]; name = cells[1]; phone = cells[2]; }
+      let jsonPart = cells.length > 3 ? cells[cells.length - 1] : text;
+      jsonPart = jsonPart.trim();
+      const tries = [jsonPart];
+      if (jsonPart.startsWith('"') && jsonPart.endsWith('"')) tries.push(jsonPart.slice(1, -1).replace(/""/g, '"'));
+      const a = jsonPart.indexOf("{"), b = jsonPart.lastIndexOf("}");
+      if (a >= 0 && b > a) { const inner = jsonPart.slice(a, b + 1); tries.push(inner, inner.replace(/""/g, '"')); }
+      for (const t of tries) {
+        try {
+          const raw = JSON.parse(t);
+          if (raw && raw.answers && raw.results) {
+            const c = raw.candidate || {};
+            return { raw, name: c.name || name, phone: c.phone || phone, ts: raw.finishedAt || ts };
+          }
+        } catch (e) { /* try next */ }
+      }
+      return null;
+    }
+
+    function show() {
+      const err = document.getElementById("raw-error");
+      const parsed = parseInput(document.getElementById("raw-input").value);
+      if (!parsed) {
+        err.textContent = "อ่านข้อมูลไม่ได้ กรุณาคัดลอกเซลล์ raw_json (คอลัมน์สุดท้าย) ทั้งเซลล์ หรือเลือกทั้งแถวแล้ววางใหม่";
+        err.classList.remove("hidden"); return;
+      }
+      err.classList.add("hidden");
+      const { raw, name, phone, ts } = parsed;
+      const v = raw.violations || [];
+      const paste = v.filter(x => ["paste", "copy", "cut", "drop"].includes(x.type)).length;
+      const tab = v.filter(x => ["tab-switch", "window-blur"].includes(x.type)).length;
+      const when = ts ? new Date(ts).toLocaleString("th-TH") : (raw.startedAt ? new Date(raw.startedAt).toLocaleString("th-TH") : "-");
+      document.getElementById("result").innerHTML = `
+        <div class="card">
+          <h2>${esc(name) || "ผู้สมัคร"} ${phone ? `<span class="muted" style="font-weight:400">โทร ${esc(phone)}</span>` : ""}</h2>
+          <p class="muted" style="margin-top:-6px">ทำแบบทดสอบเมื่อ ${esc(when)} · พยายามคัดลอก/วาง ${paste} ครั้ง · สลับหน้าจอ ${tab} ครั้ง
+            ${raw.key ? "" : " · <b>ผลนี้บันทึกก่อนมีการเก็บเฉลย ระบบใช้ข้อสอบปัจจุบันแสดงเทียบ ถ้าแก้ข้อสอบไปแล้วอาจไม่ตรง</b>"}</p>
+          ${HR_REVIEW.summaryHtml(raw.results)}
+          <h3 style="margin-top:22px">ดูรายละเอียดคำตอบ</h3>
+          <div class="review-nav">${HR_REVIEW.navHtml()}</div>
+        </div>`;
+      document.getElementById("review").innerHTML = "";
+      document.querySelectorAll("[data-review]").forEach(btn => btn.addEventListener("click", () => {
+        document.querySelectorAll("[data-review]").forEach(x => x.classList.toggle("active", x === btn));
+        HR_REVIEW.render(document.getElementById("review"), btn.dataset.review, raw, cfg);
+        document.getElementById("review").scrollIntoView({ behavior: "smooth" });
+      }));
+      document.querySelector('[data-review="part1"]').click();
+    }
+    document.getElementById("show-btn").addEventListener("click", show);
+  })();
+  </script>
+</body>
+</html>
