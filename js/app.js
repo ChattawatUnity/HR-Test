@@ -72,6 +72,55 @@
   function stopTimer() { if (timerHandle) clearInterval(timerHandle); timerHandle = null; }
   function hideTimer() { stopTimer(); timerEl.classList.add("hidden"); }
 
+  /* ---------- in-page modal (ไม่ใช้ confirm/alert ของเบราว์เซอร์ เพราะทำให้หลุดเต็มจอ) ---------- */
+  let modalResolve = null;
+  function closeModal(result) {
+    const ov = document.getElementById("modal-overlay");
+    if (ov) ov.remove();
+    document.removeEventListener("keydown", modalKeys, true);
+    if (modalResolve) { const r = modalResolve; modalResolve = null; r(result); }
+  }
+  function modalKeys(e) {
+    if (e.key === "Enter") { e.preventDefault(); e.stopPropagation(); closeModal(true); }
+    else if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); closeModal(false); }
+  }
+  function showModal({ message, okText = "ตกลง", cancelText = null }) {
+    closeModal(false);
+    return new Promise(resolve => {
+      modalResolve = resolve;
+      const ov = document.createElement("div");
+      ov.id = "modal-overlay"; ov.className = "modal-overlay";
+      ov.innerHTML = `<div class="modal" role="dialog" aria-modal="true">
+          <p class="modal-msg"></p>
+          <div class="modal-actions">
+            ${cancelText ? `<button type="button" class="btn btn-secondary btn-inline" data-r="0"></button>` : ""}
+            <button type="button" class="btn btn-primary btn-inline" data-r="1"></button>
+          </div></div>`;
+      ov.querySelector(".modal-msg").textContent = message;
+      ov.querySelector('[data-r="1"]').textContent = okText;
+      if (cancelText) ov.querySelector('[data-r="0"]').textContent = cancelText;
+      ov.addEventListener("click", e => { const b = e.target.closest("[data-r]"); if (b) closeModal(b.dataset.r === "1"); });
+      document.body.appendChild(ov);
+      document.addEventListener("keydown", modalKeys, true);
+      ov.querySelector('[data-r="1"]').focus();
+    });
+  }
+
+  /* ---------- ปุ่มกลับเข้าเต็มจอ ---------- */
+  const fsBtn = document.getElementById("fs-btn");
+  function isFullscreen() {
+    return !!document.fullscreenElement || (window.innerHeight >= screen.height - 2 && window.innerWidth >= screen.width - 2);
+  }
+  function updateFsBtn() {
+    const inPart = state.stage !== "register" && state.stage !== "summary";
+    fsBtn.classList.toggle("hidden", !inPart || isFullscreen());
+  }
+  fsBtn.addEventListener("click", () => {
+    try { document.documentElement.requestFullscreen().catch(() => {}); } catch (e) {}
+  });
+  document.addEventListener("fullscreenchange", updateFsBtn);
+  window.addEventListener("resize", updateFsBtn);
+
   /* ---------- views ---------- */
   function renderRegister() {
     hideTimer();
@@ -154,12 +203,23 @@
       state.deadline = null;
       saveState(); render();
     };
-    ui.submitBtn.addEventListener("click", () => {
-      if (ui.confirmText && !window.confirm(ui.confirmText)) return;
+    let asking = false;
+    ui.submitBtn.addEventListener("click", async () => {
+      if (asking || done) return;
+      if (ui.confirmText) {
+        asking = true;
+        const ok = await showModal({ message: ui.confirmText, okText: "ส่ง", cancelText: "ยกเลิก" });
+        asking = false;
+        if (!ok) return;
+      }
       finish(false);
     });
     const countUp = partId === "part1" && !!cfg.PART1_COUNT_UP;
-    startTimer(countUp ? "เวลาที่ใช้" : `Part ${idx}`, () => { alert("หมดเวลา Part " + idx + " ระบบจะบันทึกคำตอบและไปส่วนถัดไป"); finish(true); }, countUp);
+    startTimer(countUp ? "เวลาที่ใช้" : `Part ${idx}`, () => {
+      closeModal(false);
+      finish(true);
+      showModal({ message: `หมดเวลา Part ${idx} ระบบบันทึกคำตอบแล้ว`, okText: "ตกลง" });
+    }, countUp);
   }
 
   function renderSummary() {
@@ -311,6 +371,7 @@
   }
 
   function render() {
+    updateFsBtn();
     const s = state.stage;
     if (s === "register") return renderRegister();
     if (s.startsWith("intro:")) return renderIntro(s.slice(6));
