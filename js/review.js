@@ -53,7 +53,7 @@
   }
 
   /* box = element ที่จะแสดงผล, data = { answers, results, key? } */
-  function render(box, partId, data, baseCfg) {
+  function render(box, partId, data, baseCfg, opts) {
     const cfg = keyFor(data, baseCfg);
     const r = data.results[partId], a = data.answers[partId];
     const idx = ORDER.indexOf(partId) + 1;
@@ -105,8 +105,63 @@
         if (d) cell.classList.add("r-" + d);
       });
     }
-    if (container) container.classList.toggle("wide", partId === "part3");
+    if (container && !(opts && opts.noLayout)) container.classList.toggle("wide", partId === "part3");
   }
 
-  window.HR_REVIEW = { ORDER, snapshotKey, summaryHtml, navHtml, render };
+  /* ---------- ไฟล์ผลสอบ HTML ไฟล์เดียว (ส่ง LINE / อีเมล) ----------
+     ไม่มี JavaScript และไม่โหลดอะไรจากภายนอก เพราะตัวเปิดไฟล์ในแอปแชทมักปิด JS */
+  function buildReportHtml(raw, meta, baseCfg, cssText) {
+    const scratch = document.createElement("div");
+    const sections = ORDER.map((p, i) => {
+      render(scratch, p, raw, baseCfg, { noLayout: true });
+      return `<section id="${p}" class="report-part">${scratch.innerHTML}</section>`;
+    }).join("");
+    const v = raw.violations || [];
+    const paste = v.filter(x => ["paste", "copy", "cut", "drop"].includes(x.type)).length;
+    const tab = v.filter(x => ["tab-switch", "window-blur"].includes(x.type)).length;
+    const nav = ORDER.map((p, i) => `<a href="#${p}">Part ${i + 1}</a>`).join("");
+    return `<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>ผลสอบ ${esc(meta.name || "ผู้สมัคร")}</title>
+<style>
+${cssText}
+.report-nav { position: sticky; top: 0; z-index: 10; display: flex; gap: 8px; padding: 10px 16px; background: var(--navy-dark); overflow-x: auto; }
+.report-nav a { color: #fff; text-decoration: none; font-weight: 700; font-size: 15px; padding: 6px 14px; border-radius: 999px; background: rgba(255,255,255,.14); white-space: nowrap; }
+.report-part { scroll-margin-top: 60px; }
+.report-part .bl-compare { overflow-x: auto; }
+.report-part .bl-compare > div { min-width: 640px; }
+.report-part .bl-cell .val { height: auto; min-height: calc(var(--rows, 1) * 15px); overflow: visible; }
+@media (max-width: 700px) {
+  .container { padding: 12px; }
+  .card { padding: 16px; }
+  .summary-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat .v { font-size: 19px; }
+  .review-table { font-size: 14px; }
+  .review-table td, .review-table th { padding: 6px; }
+  .review-table td:nth-child(n+3) { word-break: break-all; }
+  .review-table td:nth-child(-n+2), .review-table th { white-space: nowrap; }
+  .diff-block { font-size: 15px; }
+}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="topbar-inner"><h1>ผลแบบทดสอบผู้สมัคร</h1></div></header>
+<nav class="report-nav">${nav}</nav>
+<main class="container">
+  <div class="card">
+    <h2>${esc(meta.name || "ผู้สมัคร")}${meta.phone ? ` <span class="muted" style="font-weight:400">โทร ${esc(meta.phone)}</span>` : ""}</h2>
+    <p class="muted" style="margin-top:-6px">ทำแบบทดสอบเมื่อ ${esc(meta.when || "-")} · พยายามคัดลอก/วาง ${paste} ครั้ง · สลับหน้าจอ ${tab} ครั้ง</p>
+    ${summaryHtml(raw.results)}
+  </div>
+  ${sections}
+</main>
+</body>
+</html>`;
+  }
+
+  window.HR_REVIEW = { ORDER, snapshotKey, summaryHtml, navHtml, render, buildReportHtml };
 })();
