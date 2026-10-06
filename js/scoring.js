@@ -85,8 +85,16 @@
     };
   }
 
+  /* Part 2 WPM: ตัวอักษรที่พิมพ์ทั้งหมด (To, Cc, Subject, เนื้อหา) / 5 ต่อนาที
+     รวมเวลาอ่านโจทย์และตรวจทาน จึงต่ำกว่า Part 1 เสมอ */
+  function part2Wpm(answer, secondsUsed) {
+    if (!answer || !secondsUsed) return null;
+    const chars = Array.from([answer.to, answer.cc, answer.subject, answer.body].map(x => x || "").join("")).length;
+    return +((chars / 5) / (Math.max(secondsUsed, 5) / 60)).toFixed(1);
+  }
+
   /* Part 2 — ความถูกต้องรวม (To + Cc + เนื้อหา) นับเป็นเปอร์เซ็นต์ตัวอักษรที่ตรง */
-  function scorePart2(answer, expected) {
+  function scorePart2(answer, expected, secondsUsed) {
     const lc = x => String(x || "").trim().toLowerCase();
     const bodyA = normalizeText(answer.body), bodyE = normalizeText(expected.body);
     const parts = [
@@ -105,7 +113,7 @@
     return {
       toOk: detail.to.ok, ccOk: detail.cc.ok, bodyOk: detail.body.ok, ccOpened: !!answer.ccOpened,
       bodySimilarity: detail.body.similarity, errors, referenceChars: refLen,
-      accuracy, score: accuracy, detail,
+      accuracy, score: accuracy, detail, wpm: part2Wpm(answer, secondsUsed),
     };
   }
 
@@ -135,7 +143,7 @@
     return { correct, total: questions.length, score: +(correct / questions.length).toFixed(4), detail };
   }
 
-  const api = { levenshtein, diffOps, similarity, normalizeText, normalizeField, scorePart1, scorePart2, scorePart3, scorePart4 };
+  const api = { levenshtein, diffOps, part2Wpm, similarity, normalizeText, normalizeField, scorePart1, scorePart2, scorePart3, scorePart4 };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   root.HR_SCORING = api;
 })(typeof window !== "undefined" ? window : globalThis);

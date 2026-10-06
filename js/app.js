@@ -225,8 +225,6 @@
   function renderSummary() {
     hideTimer();
     const r = state.results;
-    const pasteCount = state.violations.filter(v => ["paste", "copy", "cut", "drop"].includes(v.type)).length;
-    const tabCount = state.violations.filter(v => ["tab-switch", "window-blur"].includes(v.type)).length;
     app.innerHTML = `
       <div class="card">
         <h2>ทำแบบทดสอบครบแล้ว</h2>
@@ -248,26 +246,24 @@
       renderReview(b.dataset.review);
       document.getElementById("review").scrollIntoView({ behavior: "smooth" });
     }));
-    const payload = buildPayload(pasteCount, tabCount);
+    /* สร้างผลครั้งเดียวแล้วเก็บไว้ รีเฟรชหน้าสรุปจะไม่ส่งซ้ำ */
+    if (!state.payload) { state.payload = buildPayload(); saveState(); }
+    const payload = state.payload;
     document.getElementById("download-btn").addEventListener("click", () => downloadJson(payload));
-    submitResults(payload);
+    if (state.submitted) {
+      document.getElementById("submit-status").innerHTML = '<span class="status-ok">ส่งผลเรียบร้อยแล้ว</span> สามารถปิดหน้าต่างนี้ได้';
+    } else {
+      submitResults(payload);
+    }
   }
 
   function renderReview(partId) {
     HR_REVIEW.render(document.getElementById("review"), partId, { answers: state.answers, results: state.results }, cfg);
   }
 
-  function buildPayload(pasteCount, tabCount) {
-    const r = state.results;
+  /* ส่งเฉพาะ raw: Apps Script สรุปคอลัมน์ในชีตจากข้อมูลนี้เอง */
+  function buildPayload() {
     return {
-      timestamp: new Date().toISOString(),
-      name: state.candidate.name,
-      phone: state.candidate.phone,
-      p1_wpm: r.part1.wpm, p1_netWpm: r.part1.netWpm, p1_accuracy: r.part1.accuracy, p1_completion: r.part1.completion, p1_timeUsed: r.part1.secondsUsed,
-      p2_accuracy: r.part2.accuracy, p2_errors: r.part2.errors, p2_to_ok: r.part2.toOk, p2_cc_ok: r.part2.ccOk, p2_body_ok: r.part2.bodyOk, p2_body_similarity: r.part2.bodySimilarity, p2_timeUsed: r.part2.secondsUsed,
-      p3_fixed: r.part3.fixed, p3_missed: r.part3.missed, p3_damaged: r.part3.damaged, p3_total: r.part3.total, p3_score: r.part3.score, p3_timeUsed: r.part3.secondsUsed,
-      p4_correct: r.part4.correct, p4_total: r.part4.total, p4_score: r.part4.score, p4_timeUsed: r.part4.secondsUsed,
-      violations_paste: pasteCount, violations_tabSwitch: tabCount,
       raw: {
         candidate: state.candidate, startedAt: state.startedAt, finishedAt: new Date().toISOString(),
         answers: state.answers, results: state.results, violations: state.violations, userAgent: navigator.userAgent,
@@ -302,7 +298,7 @@
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `hr-test-${payload.name.replace(/\s+/g, "_")}-${Date.now()}.json`;
+    a.download = `hr-test-${state.candidate.name.replace(/\s+/g, "_")}-${Date.now()}.json`;
     a.click();
   }
 

@@ -81,8 +81,8 @@ window.HR_PARTS.part2 = {
       ccOpened: this._state.ccOpened,
     };
   },
-  score(cfg, answer) {
-    return HR_SCORING.scorePart2(answer, cfg.PART2);
+  score(cfg, answer, secondsUsed) {
+    return HR_SCORING.scorePart2(answer, cfg.PART2, secondsUsed);
   },
 };
 function escapeHtml(s) {

@@ -73,19 +73,17 @@
       }
       err.classList.add("hidden");
       const { raw, name, phone, ts } = parsed;
-      const v = raw.violations || [];
-      const paste = v.filter(x => ["paste", "copy", "cut", "drop"].includes(x.type)).length;
-      const tab = v.filter(x => ["tab-switch", "window-blur"].includes(x.type)).length;
+      const { paste, leave: tab } = HR_REVIEW.violationCounts(raw.violations);
       const when = ts ? new Date(ts).toLocaleString("th-TH") : (raw.startedAt ? new Date(raw.startedAt).toLocaleString("th-TH") : "-");
       document.getElementById("result").innerHTML = `
         <div class="card">
           <h2>${esc(name) || "ผู้สมัคร"} ${phone ? `<span class="muted" style="font-weight:400">โทร ${esc(phone)}</span>` : ""}</h2>
-          <p class="muted" style="margin-top:-6px">ทำแบบทดสอบเมื่อ ${esc(when)} · พยายามคัดลอก/วาง ${paste} ครั้ง · สลับหน้าจอ ${tab} ครั้ง
+          <p class="muted" style="margin-top:-6px">ทำแบบทดสอบเมื่อ ${esc(when)} · พยายามคัดลอก/วาง ${paste} ครั้ง · ออกนอกหน้าจอ ${tab} ครั้ง
             ${raw.key ? "" : " · <b>ผลนี้บันทึกก่อนมีการเก็บเฉลย ระบบใช้ข้อสอบปัจจุบันแสดงเทียบ ถ้าแก้ข้อสอบไปแล้วอาจไม่ตรง</b>"}</p>
           ${HR_REVIEW.summaryHtml(raw.results)}
           <div style="margin-top:18px">
-            <button class="btn btn-primary btn-inline" id="download-report">ดาวน์โหลดไฟล์ผล (ส่ง LINE)</button>
-            <span class="muted" style="margin-left:8px">ไฟล์ .html ไฟล์เดียว แนบในแชทแล้วกดเปิดดูได้เลย</span>
+            <button class="btn btn-primary btn-inline" id="print-report">พิมพ์ผล (A4)</button>
+            <button class="btn btn-secondary btn-inline" id="download-report" style="margin-left:6px">ดาวน์โหลดไฟล์ผล (ส่ง LINE)</button>
           </div>
           <h3 style="margin-top:22px">ดูรายละเอียดคำตอบ</h3>
           <div class="review-nav">${HR_REVIEW.navHtml()}</div>
@@ -97,6 +95,7 @@
         document.getElementById("review").scrollIntoView({ behavior: "smooth" });
       }));
       document.getElementById("download-report").addEventListener("click", () => downloadReport(raw, { name, phone, when }));
+      document.getElementById("print-report").addEventListener("click", () => printReport(raw, { name, phone, when }));
       document.querySelector('[data-review="part1"]').click();
     }
 
@@ -107,6 +106,17 @@
         try { for (const rule of sheet.cssRules) out += rule.cssText + "\n"; } catch (e) { /* ข้าม stylesheet ที่อ่านไม่ได้ */ }
       }
       return out;
+    }
+
+    /* พิมพ์ผ่าน iframe ที่ซ่อนไว้ หน้าเว็บนี้ไม่เปลี่ยน */
+    function printReport(raw, meta) {
+      const old = document.getElementById("print-frame"); if (old) old.remove();
+      const f = document.createElement("iframe");
+      f.id = "print-frame";
+      f.style.cssText = "position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden";
+      document.body.appendChild(f);
+      f.onload = () => { f.contentWindow.focus(); f.contentWindow.print(); };
+      f.srcdoc = HR_REVIEW.buildPrintHtml(raw, meta, cfg);
     }
 
     function downloadReport(raw, meta) {

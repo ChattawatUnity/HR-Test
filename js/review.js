@@ -116,9 +116,7 @@
       render(scratch, p, raw, baseCfg, { noLayout: true });
       return `<section id="${p}" class="report-part">${scratch.innerHTML}</section>`;
     }).join("");
-    const v = raw.violations || [];
-    const paste = v.filter(x => ["paste", "copy", "cut", "drop"].includes(x.type)).length;
-    const tab = v.filter(x => ["tab-switch", "window-blur"].includes(x.type)).length;
+    const { paste, leave: tab } = violationCounts(raw.violations);
     const nav = ORDER.map((p, i) => `<a href="#${p}">Part ${i + 1}</a>`).join("");
     return `<!DOCTYPE html>
 <html lang="th">
@@ -154,7 +152,7 @@ ${cssText}
 <main class="container">
   <div class="card">
     <h2>${esc(meta.name || "ผู้สมัคร")}${meta.phone ? ` <span class="muted" style="font-weight:400">โทร ${esc(meta.phone)}</span>` : ""}</h2>
-    <p class="muted" style="margin-top:-6px">ทำแบบทดสอบเมื่อ ${esc(meta.when || "-")} · พยายามคัดลอก/วาง ${paste} ครั้ง · สลับหน้าจอ ${tab} ครั้ง</p>
+    <p class="muted" style="margin-top:-6px">ทำแบบทดสอบเมื่อ ${esc(meta.when || "-")} · พยายามคัดลอก/วาง ${paste} ครั้ง · ออกนอกหน้าจอ ${tab} ครั้ง</p>
     ${summaryHtml(raw.results)}
   </div>
   ${sections}
@@ -163,5 +161,84 @@ ${cssText}
 </html>`;
   }
 
-  window.HR_REVIEW = { ORDER, snapshotKey, summaryHtml, navHtml, render, buildReportHtml };
+  /* จำนวนครั้งที่ออกนอกหน้าจอ: นับ tab-switch และ window-blur ที่ไม่ได้เกิดพร้อมกัน (ภายใน 1 วินาที) */
+  function violationCounts(violations) {
+    const v = violations || [];
+    const paste = v.filter(x => ["paste", "copy", "cut", "drop"].includes(x.type)).length;
+    const leave = v.filter(x => x.type === "tab-switch" || x.type === "window-blur")
+      .map(x => Date.parse(x.at) || 0).sort((a, b) => a - b)
+      .filter((t, i, arr) => i === 0 || t - arr[i - 1] > 1000).length;
+    return { paste, leave };
+  }
+
+  /* ---------- หน้าพิมพ์ A4 หน้าเดียว (แบบ C ขาวดำ) ---------- */
+  function buildPrintHtml(raw, meta, baseCfg) {
+    const cfg = keyFor(raw, baseCfg);
+    const A = raw.answers, R = raw.results;
+    const mmss = s => s == null ? "-" : `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+    const mark = (ref, typ) => {
+      const ops = HR_SCORING.diffOps(ref, typ);
+      return {
+        ref: ops.filter(o => o.t !== "ins").map(o => o.t === "del" ? `<span class="miss">${esc(o.c)}</span>` : esc(o.c)).join(""),
+        typ: ops.filter(o => o.t !== "del").map(o => o.t === "ins" ? `<span class="err">${esc(o.c)}</span>` : esc(o.c)).join(""),
+      };
+    };
+    const { paste, leave } = violationCounts(raw.violations);
+
+    const d1 = mark(cfg.PART1_TEXT.replace(/\s+/g, " ").trim(), (A.part1.typed || "").replace(/\s+/g, " ").trim());
+    const p2wpm = R.part2.wpm != null ? R.part2.wpm : HR_SCORING.part2Wpm(A.part2, R.part2.secondsUsed);
+    const d2 = mark(HR_SCORING.normalizeText(cfg.PART2.body), HR_SCORING.normalizeText(A.part2.body));
+
+    const labels = Object.fromEntries(cfg.BL_FIELDS.map(([k, l]) => [k, l]));
+    const wrongDoc = Object.assign({}, cfg.BL_ORIGINAL, cfg.BL_WRONG);
+    const untouched = Object.keys(wrongDoc).every(k => (A.part3[k] || "") === (wrongDoc[k] || ""));
+    const pts = cfg.PART3_ERROR_POINTS || R.part3.total;
+    const p3status = { fixed: "แก้ถูก", missed: "ยังผิด", damaged: "แก้จนผิด" };
+    const p3list = Object.entries(R.part3.detail || {}).map(([k, st]) => `${esc(labels[k] || k)}: ${p3status[st] || st}`).join(" · ");
+
+    const p4wrong = cfg.PART4.map((q, i) => ({ i, q, sel: A.part4[i] })).filter(x => x.sel !== x.q.answer);
+    const when = meta.when || "-";
+
+    return `<!DOCTYPE html><html lang="th"><head><meta charset="utf-8"><title>ผลสอบ ${esc(meta.name || "")}</title><style>
+@page { size: A4; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #fff; }
+body { font-family: Tahoma, "Leelawadee UI", Arial, sans-serif; color: #000; }
+.page { width: 210mm; min-height: 297mm; padding: 14mm 15mm; }
+.err { border-bottom: 2px solid #000; font-weight: 700; }
+.miss { text-decoration: line-through; }
+.hd { text-align: center; border-bottom: 1px solid #000; padding-bottom: 6px; }
+.hd h1 { margin: 0; font-size: 17px; letter-spacing: .5px; } .hd div { font-size: 11px; margin-top: 2px; }
+table.info { width: 100%; font-size: 11.5px; margin: 8px 0; } table.info td { padding: 2px 0; }
+table.sum { width: 100%; border-collapse: collapse; font-size: 11.5px; margin-bottom: 6px; }
+table.sum td, table.sum th { border: 1px solid #000; padding: 4px 6px; text-align: center; }
+table.sum th { font-weight: 700; background: #eee; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+h2 { font-size: 12.5px; margin: 10px 0 3px; border-bottom: 1px solid #000; }
+.txt { font-size: 11px; line-height: 1.55; white-space: pre-wrap; } .lbl { font-size: 10.5px; font-weight: 700; margin-top: 3px; }
+.leg { font-size: 9.5px; margin: 2px 0; }
+ol { margin: 2px 0; padding-left: 18px; font-size: 11px; }
+</style></head><body><div class="page">
+<div class="hd"><h1>แบบบันทึกผลการทดสอบผู้สมัครงาน</h1><div>UNITY AGENCY COMPANY LIMITED</div></div>
+<table class="info"><tr><td>ชื่อ-นามสกุล: <b>${esc(meta.name || "-")}</b></td><td>โทร: ${esc(meta.phone || "-")}</td><td style="text-align:right">วันที่สอบ: ${esc(when)}</td></tr>
+<tr><td colspan="3">ข้อสังเกต: ออกนอกหน้าจอ ${leave} ครั้ง, พยายามคัดลอก/วาง ${paste} ครั้ง</td></tr></table>
+<table class="sum"><tr><th>ส่วน</th><th>ผล</th><th>ข้อผิดพลาด</th><th>เวลา</th></tr>
+<tr><td>1. พิมพ์ข้อความ</td><td>${R.part1.wpm} WPM</td><td>${R.part1.errors} ตัวอักษร</td><td>${mmss(R.part1.secondsUsed)}</td></tr>
+<tr><td>2. อีเมล</td><td>${p2wpm != null ? p2wpm + " WPM" : "-"}</td><td>${R.part2.errors != null ? R.part2.errors + " ตัวอักษร" : "-"}</td><td>${mmss(R.part2.secondsUsed)}</td></tr>
+<tr><td>3. ตรวจ B/L</td><td>${untouched ? `พบ ____ / ${pts} จุด (กระดาษ)` : `แก้ถูก ${R.part3.fixed} / ${R.part3.total} ช่อง`}</td><td>${untouched ? "แก้ผิดเพิ่ม ____" : `แก้ผิดเพิ่ม ${R.part3.damaged}`}</td><td>${mmss(R.part3.secondsUsed)}</td></tr>
+<tr><td>4. คำศัพท์</td><td>${R.part4.correct} / ${R.part4.total}</td><td>${R.part4.total - R.part4.correct} ข้อ</td><td>${mmss(R.part4.secondsUsed)}</td></tr></table>
+<div class="leg">สัญลักษณ์: <span class="err">ขีดเส้นใต้หนา</span> = พิมพ์ผิด/เกิน, <span class="miss">ขีดฆ่า</span> = ตกหล่น</div>
+<h2>1. พิมพ์ข้อความ</h2>
+<div class="lbl">ต้นฉบับ</div><div class="txt">${d1.ref}</div>
+<div class="lbl">ที่พิมพ์ส่ง</div><div class="txt">${d1.typ || "(ไม่ได้พิมพ์)"}</div>
+<h2>2. อีเมล</h2>
+<div class="txt">To: ${esc(A.part2.to) || "(ว่าง)"} ${R.part2.toOk ? "(ถูก)" : "(ผิด)"} &nbsp;&nbsp; Cc: ${esc(A.part2.cc) || "(ว่าง)"} ${R.part2.ccOk ? "(ถูก)" : "(ผิด)"}${A.part2.subject ? ` &nbsp;&nbsp; Subject: ${esc(A.part2.subject)} (ไม่ต้องใส่)` : ""}${A.part2.bcc ? ` &nbsp;&nbsp; Bcc: ${esc(A.part2.bcc)} (ไม่ต้องใส่)` : ""}</div>
+<div class="lbl">เนื้อหาที่พิมพ์</div><div class="txt" style="font-size:10px;line-height:1.4">${d2.typ || "(ไม่ได้พิมพ์)"}</div>
+<h2>3. ตรวจเอกสาร B/L</h2>
+<div class="txt">${untouched ? `ไม่มีการแก้ไขในเว็บ ตรวจบนกระดาษ พบ ________ / ${pts} จุด` : p3list}</div>
+<h2>4. คำศัพท์ (เฉพาะข้อที่ผิด)</h2>
+${p4wrong.length ? `<ol>${p4wrong.map(x => `<li value="${x.i + 1}">${esc(x.q.q)} : เลือก "${x.sel == null ? "ไม่ได้ตอบ" : esc(x.q.choices[x.sel])}" (ที่ถูก: ${esc(x.q.choices[x.q.answer])})</li>`).join("")}</ol>` : `<div class="txt">ถูกทุกข้อ</div>`}
+</div></body></html>`;
+  }
+
+  window.HR_REVIEW = { ORDER, snapshotKey, summaryHtml, navHtml, render, buildReportHtml, buildPrintHtml, violationCounts };
 })();
