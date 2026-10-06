@@ -8,7 +8,7 @@ window.HR_PARTS.part2 = {
     return `
       <ul style="margin:0 0 12px;padding-left:22px">
         <li>ส่วนนี้วัด<b>ความถูกต้องแม่นยำและความละเอียด</b>ภายใต้เวลาที่นับถอยหลัง</li>
-        <li>พิมพ์ข้อความด้านล่างลงใน<b>เนื้อหาอีเมล</b>ให้เหมือนกันทุกตัวอักษร ทุกบรรทัด ทุกช่องว่าง (ไม่ต้องใส่ Subject)</li>
+        <li><b>พิมพ์ข้อความตามตัวอย่างทุกอักษร ห้ามเพิ่มหรือแต่งเอง</b> ลงใน<b>เนื้อหาอีเมล</b> (ไม่ต้องใส่ Subject)</li>
         <li>ส่งไปที่ <b>${cfg.PART2.to}</b> และ CC ไปที่ <b>${cfg.PART2.cc}</b></li>
         <li>คะแนนคิดจากเปอร์เซ็นต์ตัวอักษรที่ถูกต้องของ To, CC และเนื้อหารวมกัน ทุกตัวที่ผิดหรือขาดจะถูกหัก</li>
       </ul>
@@ -21,7 +21,7 @@ window.HR_PARTS.part2 = {
     container.innerHTML = `
       <div class="p2-layout">
       <div class="instructions p2-instructions">
-        <p style="margin:0 0 8px">พิมพ์ข้อความด้านล่างนี้ลงในเนื้อหาอีเมลให้หน้าตาเหมือนกัน <b>100%</b> <u>ไม่ต้องใส่ Subject</u> และส่งไปที่เมล <b>${cfg.PART2.to}</b> พร้อม CC ไปที่ <b>${cfg.PART2.cc}</b></p>
+        <p style="margin:0 0 8px"><b>พิมพ์ข้อความตามตัวอย่างทุกอักษร ห้ามเพิ่มหรือแต่งเอง</b> ลงในเนื้อหาอีเมล <u>ไม่ต้องใส่ Subject</u> และส่งไปที่เมล <b>${cfg.PART2.to}</b> พร้อม CC ไปที่ <b>${cfg.PART2.cc}</b></p>
         <div class="email-target">${escapeHtml(full)}</div>
       </div>
       <div class="gmail">

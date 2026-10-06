@@ -224,28 +224,16 @@
 
   function renderSummary() {
     hideTimer();
-    const r = state.results;
     app.innerHTML = `
       <div class="card">
         <h2>ทำแบบทดสอบครบแล้ว</h2>
-        <p>ขอบคุณคุณ <b>${escapeHtml(state.candidate.name)}</b> ที่ทำแบบทดสอบ ผลของคุณถูกบันทึกไว้แล้ว</p>
-        ${HR_REVIEW.summaryHtml(r)}
+        <p>ขอบคุณคุณ <b>${escapeHtml(state.candidate.name)}</b> ที่ทำแบบทดสอบ กรุณาแจ้งเจ้าหน้าที่ว่าทำเสร็จแล้ว</p>
         <p id="submit-status" class="muted" style="margin-top:18px">กำลังส่งผล...</p>
         <div id="submit-fallback" class="hidden">
           <button class="btn btn-secondary btn-inline" id="download-btn">ดาวน์โหลดไฟล์ผลสอบ</button>
           <span class="muted"> กรุณาส่งไฟล์นี้ให้เจ้าหน้าที่</span>
         </div>
-        <h3 style="margin-top:26px">ดูรายละเอียดคำตอบ</h3>
-        <div class="review-nav">
-          ${HR_REVIEW.navHtml()}
-        </div>
-      </div>
-      <div id="review"></div>`;
-    app.querySelectorAll("[data-review]").forEach(b => b.addEventListener("click", () => {
-      app.querySelectorAll("[data-review]").forEach(x => x.classList.toggle("active", x === b));
-      renderReview(b.dataset.review);
-      document.getElementById("review").scrollIntoView({ behavior: "smooth" });
-    }));
+      </div>`;
     /* สร้างผลครั้งเดียวแล้วเก็บไว้ รีเฟรชหน้าสรุปจะไม่ส่งซ้ำ */
     if (!state.payload) { state.payload = buildPayload(); saveState(); }
     const payload = state.payload;
@@ -255,10 +243,6 @@
     } else {
       submitResults(payload);
     }
-  }
-
-  function renderReview(partId) {
-    HR_REVIEW.render(document.getElementById("review"), partId, { answers: state.answers, results: state.results }, cfg);
   }
 
   /* ส่งเฉพาะ raw: Apps Script สรุปคอลัมน์ในชีตจากข้อมูลนี้เอง */
