@@ -226,3 +226,7 @@ textarea { resize: vertical; }
 .topbar-right { display: flex; align-items: center; gap: 10px; }
 .fs-btn { font: inherit; font-size: 14px; font-weight: 600; background: #fff; color: var(--navy-dark); border: 0; border-radius: 8px; padding: 7px 12px; cursor: pointer; }
 .fs-btn:hover { background: #e5e7eb; }
+
+/* แถบโจทย์ย่อระหว่างทำ */
+.task-hint { background: var(--warn-bg); border: 1px solid var(--warn-border); border-left: 5px solid var(--navy-dark); border-radius: 8px; padding: 8px 14px; font-size: 14px; color: #3d2f00; margin: 6px 0 12px; }
+.container.p3 .task-hint { padding: 5px 12px; margin: 2px 0 4px; font-size: 13.5px; }

@@ -10,6 +10,9 @@ window.HR_PARTS.part4 = {
         <li>เวลา ${Math.round(cfg.TIME_LIMITS.part4 / 60)} นาที เริ่มจับเวลาเมื่อกด "เริ่ม"</li>
       </ul>`;
   },
+  hint() {
+    return "เลือกคำแปลภาษาไทยที่ถูกต้องของคำศัพท์ภาษาอังกฤษ ข้อละ 1 คำตอบ";
+  },
   render(cfg, container) {
     container.innerHTML = cfg.PART4.map((q, i) => `
       <div class="q">

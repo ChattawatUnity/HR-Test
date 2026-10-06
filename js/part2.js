@@ -7,13 +7,11 @@ window.HR_PARTS.part2 = {
     const full = cfg.PART2.body;
     return `
       <ul style="margin:0 0 12px;padding-left:22px">
-        <li>ส่วนนี้วัด<b>ความถูกต้องแม่นยำและความละเอียด</b>ภายใต้เวลาที่นับถอยหลัง</li>
-        <li><b>พิมพ์ข้อความตามตัวอย่างทุกอักษร ห้ามเพิ่มหรือแต่งเอง</b> ลงใน<b>เนื้อหาอีเมล</b> (ไม่ต้องใส่ Subject)</li>
+        <li>พิมพ์ข้อความตามต้นฉบับ ให้ตรงทุกอักษร รวมถึงการเว้นวรรค, เว้นบรรทัด และตัวพิมพ์ใหญ่พิมพ์เล็ก <b>โดยไม่ต้องใส่ Subject</b></li>
         <li>ส่งไปที่ <b>${cfg.PART2.to}</b> และ CC ไปที่ <b>${cfg.PART2.cc}</b></li>
-        <li>คะแนนคิดจากเปอร์เซ็นต์ตัวอักษรที่ถูกต้องของ To, CC และเนื้อหารวมกัน ทุกตัวที่ผิดหรือขาดจะถูกหัก</li>
       </ul>
       <div class="email-target">${escapeHtml(full)}</div>
-      <p class="muted" style="margin:10px 0 0">เวลา ${Math.round(cfg.TIME_LIMITS.part2 / 60)} นาที เริ่มจับเวลาเมื่อกด "เริ่ม" — กดปุ่ม Send ในหน้าจอเพื่อส่งคำตอบ</p>`;
+      <p class="muted" style="margin:10px 0 0">เวลา ${Math.round(cfg.TIME_LIMITS.part2 / 60)} นาที เริ่มจับเวลาเมื่อกด "เริ่ม" เมื่อพิมพ์เสร็จกดปุ่ม <b>Send</b> เพื่อส่งคำตอบ</p>`;
   },
   render(cfg, container) {
     const full = cfg.PART2.body;
@@ -21,7 +19,7 @@ window.HR_PARTS.part2 = {
     container.innerHTML = `
       <div class="p2-layout">
       <div class="instructions p2-instructions">
-        <p style="margin:0 0 8px"><b>พิมพ์ข้อความตามตัวอย่างทุกอักษร ห้ามเพิ่มหรือแต่งเอง</b> ลงในเนื้อหาอีเมล <u>ไม่ต้องใส่ Subject</u> และส่งไปที่เมล <b>${cfg.PART2.to}</b> พร้อม CC ไปที่ <b>${cfg.PART2.cc}</b></p>
+        <p style="margin:0 0 8px"><b>พิมพ์ข้อความตามตัวอย่างทุกอักษร</b> ลงในเนื้อหาอีเมล <u>ไม่ต้องใส่ Subject</u> และส่งไปที่เมล <b>${cfg.PART2.to}</b> พร้อม CC ไปที่ <b>${cfg.PART2.cc}</b></p>
         <div class="email-target">${escapeHtml(full)}</div>
       </div>
       <div class="gmail">
