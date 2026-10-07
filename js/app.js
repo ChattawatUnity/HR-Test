@@ -164,13 +164,23 @@
     hideTimer();
     const mod = window.HR_PARTS[partId];
     const idx = ORDER.indexOf(partId) + 1;
-    app.innerHTML = `
-      <div class="card">
-        <div class="part-title"><span class="badge">Part ${idx} / ${ORDER.length}</span><h2 style="margin:0">${mod.title}</h2></div>
-        <div class="instructions">${mod.intro(cfg)}</div>
-        <p class="muted">เมื่อกด "เริ่ม" ระบบจะเริ่มจับเวลาทันที</p>
-        <button class="btn btn-primary" id="start-btn">เริ่ม</button>
-      </div>`;
+    if (mod.inlineStart) {
+      app.innerHTML = `
+        <div class="card">
+          <div class="part-title"><span class="badge">Part ${idx} / ${ORDER.length}</span><h2 style="margin:0">${mod.title}</h2></div>
+          <div class="instructions">${mod.intro(cfg)}</div>
+          <div id="part-body"></div>
+        </div>`;
+      mod.render(cfg, document.getElementById("part-body"), { locked: true });
+    } else {
+      app.innerHTML = `
+        <div class="card">
+          <div class="part-title"><span class="badge">Part ${idx} / ${ORDER.length}</span><h2 style="margin:0">${mod.title}</h2></div>
+          <div class="instructions">${mod.intro(cfg)}</div>
+          <p class="muted">เมื่อกด "เริ่ม" ระบบจะเริ่มจับเวลาทันที</p>
+          <button class="btn btn-primary" id="start-btn">เริ่ม</button>
+        </div>`;
+    }
     document.getElementById("start-btn").addEventListener("click", () => {
       state.partStartedAt = Date.now();
       state.deadline = Date.now() + cfg.TIME_LIMITS[partId] * 1000;
@@ -185,7 +195,8 @@
     app.innerHTML = `
       <div class="card">
         <div class="part-title"><span class="badge">Part ${idx} / ${ORDER.length}</span><h2 style="margin:0">${mod.title}</h2></div>
-        ${mod.hint ? `<div class="task-hint"><b>โจทย์:</b> ${mod.hint(cfg)}</div>` : ""}
+        ${mod.inlineStart ? `<div class="instructions">${mod.intro(cfg)}</div>`
+          : mod.hint ? `<div class="task-hint"><b>โจทย์:</b> ${mod.hint(cfg)}</div>` : ""}
         <div id="part-body"></div>
       </div>`;
     const container = document.getElementById("part-body");

@@ -223,7 +223,7 @@ textarea { resize: vertical; }
 .modal-actions .btn { padding: 10px 22px; }
 
 /* ปุ่มกลับเต็มจอ */
-.topbar-right { display: flex; align-items: center; gap: 10px; }
+.topbar-right { display: flex; align-items: center; gap: 10px; height: 0; overflow: visible; }
 .fs-btn { font: inherit; font-size: 14px; font-weight: 600; background: #fff; color: var(--navy-dark); border: 0; border-radius: 8px; padding: 7px 12px; cursor: pointer; }
 .fs-btn:hover { background: #e5e7eb; }
 
