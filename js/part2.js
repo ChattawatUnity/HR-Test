@@ -63,6 +63,19 @@ window.HR_PARTS.part2 = {
     });
     const body = container.querySelector("#p2-body");
     if (!body.isContentEditable) body.setAttribute("contenteditable", "true");
+    /* ให้ความกว้างข้อความในกล่องพิมพ์เท่ากับกล่องต้นฉบับ บรรทัดจะตัดตำแหน่งเดียวกัน */
+    const target = container.querySelector(".email-target");
+    const syncWidth = () => {
+      if (!document.body.contains(body)) { window.removeEventListener("resize", syncWidth); return; }
+      body.style.paddingRight = "";
+      const tcs = getComputedStyle(target), bcs = getComputedStyle(body);
+      const textW = target.clientWidth - parseFloat(tcs.paddingLeft) - parseFloat(tcs.paddingRight);
+      const padL = parseFloat(bcs.paddingLeft);
+      const extra = body.clientWidth - padL - textW;
+      if (extra >= 0) body.style.paddingRight = extra + "px";
+    };
+    syncWidth();
+    window.addEventListener("resize", syncWidth);
     container.querySelector("#p2-to").focus();
     this._state = state;
     return { submitBtn: container.querySelector("#p2-send"), confirmText: "ยืนยันการส่งอีเมลนี้?" };
