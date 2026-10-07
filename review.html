@@ -15,12 +15,7 @@
   <main class="container" id="app">
     <div class="card" id="input-card">
       <h2>วางผลสอบจาก Google Sheet</h2>
-      <ol class="muted" style="margin:0 0 12px;padding-left:20px;font-size:15px">
-        <li>เปิดชีต Results แล้วคลิกเลขแถวของผู้สมัครทางซ้ายสุด เพื่อเลือกทั้งแถว (หรือคลิกเฉพาะเซลล์ raw_json ก็ได้)</li>
-        <li>กด Ctrl+C แล้วกลับมาวางในช่องด้านล่างด้วย Ctrl+V</li>
-        <li>กด "แสดงผล" ข้อมูลจะแสดงบนเครื่องนี้เท่านั้น ไม่ถูกส่งไปที่ไหน</li>
-      </ol>
-      <textarea id="raw-input" rows="6" spellcheck="false" placeholder='วางทั้งแถว หรือเฉพาะเซลล์ raw_json ที่ขึ้นต้นด้วย {"startedAt": ...'></textarea>
+      <textarea id="raw-input" rows="6" spellcheck="false" placeholder="วาง JSON"startedAt": ...'></textarea>
       <div class="error hidden" id="raw-error"></div>
       <button class="btn btn-primary" id="show-btn">แสดงผล</button>
     </div>
