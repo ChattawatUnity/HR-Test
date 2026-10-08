@@ -2,7 +2,7 @@
 window.HR_PARTS = window.HR_PARTS || {};
 window.HR_PARTS.part1 = {
   id: "part1",
-  title: "พิมพ์ข้อความ (ไทย-อังกฤษ)",
+  title: "พิมพ์ข้อความตามต้นฉบับ",
   /* หน้าเดียว: เห็นข้อความต้นฉบับก่อนกด "เริ่ม" กล่องพิมพ์ล็อกไว้จนกว่าจะเริ่ม */
   inlineStart: true,
   intro(cfg) {
